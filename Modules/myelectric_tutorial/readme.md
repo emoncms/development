@@ -115,7 +115,7 @@ Replace the hello world view code with the following HTML which creates the powe
 
 To make the display show an actual power and kwh feed value we need to add a little javascript that periodically get's the latest value of the feeds and then updates the html elements. 
 
-To make this step a little easier the feed module has a library that we can use to request the feed values, which saves us from writting out the AJAX request ourselves. 
+To make this step a little easier the feed module has a library that we can use to request the feed values, which saves us from writting out the AJAX request ourselves. **Note:** this example uses the latest version of the feed.js helper library you may need to update your emoncms installation to get access to the **feed.list_by_id()** function.
 
 Add the following code below the html code above in myelectric_view.php:
 
@@ -168,6 +168,30 @@ Replace the code within the <script> ... </script> tags with the following to ha
     
 **Try it out:** navigate to http://your-ip-address/emoncms/myelectric/view in your browser again and the view should be updating every 5 seconds.
 
-## 4) Creating a menu item for our module
+## 4) Creating a menu item for the module
 
-## 5) Setting module access permissions
+Create a file in the myelectric module folder called myelectric_menu.php and add the following menu defenition code to it:
+
+    <?php
+
+      $menu_left[] = array('name'=>"My Electric", 'path'=>"myelectric/view" , 'session'=>"write", 'order' => -2 );
+
+    ?>
+
+Refresh the page, the My Electric menu item will appear top left.
+
+## 5) Setting access permissions
+
+The controller code above did not check if the user is logged in. To only allow access to the page when the user has full read/write permissions change the line in myelectric_controller.php from:
+
+    if ($route->action == "view") $result = view("Modules/myelectric/myelectric_view.php",array());
+
+to
+
+    if ($route->action == "view" && $session['write']) $result = view("Modules/myelectric/myelectric_view.php",array());
+    
+    
+Thats it! you've built an emoncms module. 
+
+
+
