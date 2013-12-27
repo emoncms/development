@@ -50,6 +50,25 @@ is first converted by a file called .htaccess into:
 "myelectric/view" is now the value of the URL property "q" and this argument is passed to index.php wich you will see in the main emoncms folder. 
 
 
+## 3) The view
+
+Its best not to build the content (view) in the controller itself as we've done in the simple hello world example above instead we create another file for this which we then load from the controller.
+
+Change the line in myelectric_controller.php:
+
+    if ($route->action == "view") $result = "<h2>Hello World</h2>";
+
+to 
+
+    if ($route->action == "view") $result = view("Modules/myelectric/myelectric_view.php",array());
+    
+and create a file called myelectric_view.php in the myelectric module folder, type some html in there:
+
+    <h2>Hello World</h2>
+    <p>Im now serving this from myelectric_view.php</p>
+
+Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see hello world again.
 
 
- 
+
+
