@@ -1,4 +1,4 @@
-# How to write your own emoncms module
+# How to create an emoncms module
 
 In this tutorial we will create a simple custom display module for emoncms that shows a readout of current home power use and how many kwh's have been used today.
 
