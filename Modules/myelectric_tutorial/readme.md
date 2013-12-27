@@ -29,7 +29,7 @@ The most important script (file) that your module needs is a script called the c
         return array('content'=>$result);
       }
 
-Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser:
+**Try it out:** navigate to http://your-ip-address/emoncms/myelectric/view in your browser:
 
 ![Hello World](images/helloworld.png)
 
@@ -67,11 +67,11 @@ and create a file called myelectric_view.php in the myelectric module folder, ty
     <h2>Hello World</h2>
     <p>Im now serving this from myelectric_view.php</p>
 
-Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see hello world again.
+**Try it out:** navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see hello world again.
 
 ### Building the power display
 
-Replace the hello world view code with the following HTML which creates our power display (although static for now).
+Replace the hello world view code with the following HTML which creates the power display (although value wont change for now).
 
     <!-- defenition of the style/look of the elements on our page (CSS stylesheet) -->
     <style>
@@ -111,7 +111,7 @@ Replace the hello world view code with the following HTML which creates our powe
         <div class="kwh-value">USE TODAY: <b><span id="kwhd">3.2</span> kWh</b></div>
     </div>
     
-Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see a static version of the screenshot above.
+**Try it out:** navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see a static version of the screenshot above.
 
 To make the display show an actual power and kwh feed value we need to add a little javascript that periodically get's the latest value of the feeds and then updates the html elements. 
 
@@ -138,7 +138,7 @@ Add the following code below the html code above in myelectric_view.php:
 
 Set the feed id's to the id's of your power and kwhd feed.
 
-You should now see the last value of your power and kwh feed but it wont yet be updating periodically. To update the power and kwh value periodically say every 5 seconds we use the javascript setInterval(function,time ms) function. 
+**Try it out:** You should now see the last value of your power and kwh feed but it wont yet be updating periodically. To update the power and kwh value periodically say every 5 seconds we use the javascript setInterval(function,time ms) function. 
 
 Replace the code within the <script> ... </script> tags with the following to have the values update periodically:
 
@@ -166,7 +166,7 @@ Replace the code within the <script> ... </script> tags with the following to ha
       
     </script>
     
-Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser again and the view should be updating every 5 seconds.
+**Try it out:** navigate to http://your-ip-address/emoncms/myelectric/view in your browser again and the view should be updating every 5 seconds.
 
 ## 4) Creating a menu item for our module
 
