@@ -8,6 +8,8 @@ In this tutorial we will create a simple custom display module for emoncms that 
 
 When you open the emoncms directory you will see a folder called Modules, lets call our new module “myelectric”. Create a folder within the Modules folder called “myelectric”.
 
+![Modules Folder](images/modulesfolder.png)
+
 ## 2) The Controller
 
 The most important script (file) that your module needs is a script called the controller. When you go to *http://emoncms.org/myelectric* the module controller is what deals with that request. Create a file called *myelectric_controller.php* in the *myelectric* folder and copy the following code in there:
