@@ -2,7 +2,7 @@
 
 In this tutorial we will create a simple custom display module for emoncms that shows a readout of current home power use and how many kwh's have been used today.
 
-[My Electric](images/myelectric.png)
+![My Electric](images/myelectric.png)
 
 ## 1) Create a folder for your module
 
@@ -29,7 +29,7 @@ The most important script (file) that your module needs is a script called the c
 
 Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser:
 
-[Hello World](images/helloworld.png)
+![Hello World](images/helloworld.png)
 
 ## Important concept: The front controller
 
