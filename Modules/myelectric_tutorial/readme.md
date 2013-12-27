@@ -69,17 +69,16 @@ and create a file called myelectric_view.php in the myelectric module folder, ty
 
 Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see hello world again.
 
-### myelectric_view.php example code:
+### Building the power display
 
-    <!-- bring in the emoncms path variable which tells this script what the base URL of emoncms is -->
-    <?php global $path; ?>
-
-    <!-- feed.js is the feed api helper library, it gives us nice functions to use within our program that
-    calls the feed API on the server via AJAX. -->
-    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
+Replace the hello world view code with the following HTML which creates our power display (although static for now).
 
     <!-- defenition of the style/look of the elements on our page (CSS stylesheet) -->
     <style>
+    
+      body {
+        background-color:#222;
+      }
 
       .electric-title {
         font-weight:bold; 
@@ -108,17 +107,45 @@ Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your b
     <!-- margin: 0px auto; max-width:320px; aligns the elements to the middle of the page -->
     <div style="margin: 0px auto; max-width:320px;">
         <div class="electric-title">POWER NOW:</div>
-        <div class="power-value"><span id="power"></span>W</div>
-        <div class="kwh-value">USE TODAY: <b><span id="kwhd"></span> kWh</b></div>
+        <div class="power-value"><span id="power">250</span>W</div>
+        <div class="kwh-value">USE TODAY: <b><span id="kwhd">3.2</span> kWh</b></div>
     </div>
+    
+Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser, you should see a static version of the screenshot above.
+
+To make the display show an actual power and kwh feed value we need to add a little javascript that periodically get's the latest value of the feeds and then updates the html elements. 
+
+To make this step a little easier the feed module has a library that we can use to request the feed values, which saves us from writting out the AJAX request ourselves. 
+
+Add the following code below the html code above in myelectric_view.php:
+
+    <!-- bring in the emoncms path variable which tells this script what the base URL of emoncms is -->
+    <?php global $path; ?>
+
+    <!-- feed.js is the feed api helper library, it gives us nice functions to use within our program that
+    calls the feed API on the server via AJAX. -->
+    <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Modules/feed/feed.js"></script>
+
+    <script>
+      // The feed api library requires the emoncms path
+      var path = "<?php echo $path; ?>"
+      var feeds = feed.list_by_id();    
+        
+      // Update the elements on the page with the latest power and energy values.
+      $("#power").html(feeds[1]);               // feeds[power-feed-id]
+      $("#kwhd").html(feeds[2].toFixed(1));     // feeds[kwhd-feed-id]
+    </script>
+
+Set the feed id's to the id's of your power and kwhd feed.
+
+You should now see the last value of your power and kwh feed but it wont yet be updating periodically. To update the power and kwh value periodically say every 5 seconds we use the javascript setInterval(function,time ms) function. 
+
+Replace the code within the <script> ... </script> tags with the following to have the values update periodically:
 
     <script>
 
       // The feed api library requires the emoncms path
       var path = "<?php echo $path; ?>"
-      
-      // Set the background color to dark grey - looks nice on a mobile.
-      $("body").css('background-color','#222');
       
       update();
 
@@ -133,12 +160,14 @@ Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your b
         var feeds = feed.list_by_id();    
         
         // Update the elements on the page with the latest power and energy values.
-        $("#power").html(feeds[1063]);
-        $("#kwhd").html(feeds[1064].toFixed(1));
+        $("#power").html(feeds[1]);
+        $("#kwhd").html(feeds[2].toFixed(1));
       }
       
     </script>
+    
+Try it out, navigate to http://your-ip-address/emoncms/myelectric/view in your browser again and the view should be updating every 5 seconds.
 
+## 4) Creating a menu item for our module
 
-
-
+## 5) Setting module access permissions
