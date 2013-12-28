@@ -136,11 +136,11 @@ Add the following code below the html code above in myelectric_view.php:
       $("#kwhd").html(feeds[2].toFixed(1));     // feeds[kwhd-feed-id]
     </script>
 
-Set the feed id's to the id's of your power and kwhd feed.
+**Important:** Set the feed id's to the id's of your power and kwhd feed.
 
 **Try it out:** You should now see the last value of your power and kwh feed but it wont yet be updating periodically. To update the power and kwh value periodically say every 5 seconds we use the javascript setInterval(function,time ms) function. 
 
-Replace the code within the \<\script\>\ ... \<\/script\>\ tags with the following to have the values update periodically:
+Replace the code within the \<script\> ... \</script\> tags with the following to have the values update periodically:
 
     <script>
 
