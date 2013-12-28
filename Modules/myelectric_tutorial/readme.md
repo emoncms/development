@@ -117,7 +117,7 @@ To make the display show an actual power and kwh feed value we need to add a lit
 
 To make this step a little easier the feed module has a library that we can use to request the feed values, which saves us from writting out the AJAX request ourselves. **Note:** this example uses the latest version of the feed.js helper library you may need to update your emoncms installation to get access to the **feed.list_by_id()** function.
 
-Add the following code below the html code above in myelectric_view.php:
+Add the following code just below the html code that you copied above in myelectric_view.php:
 
     <!-- bring in the emoncms path variable which tells this script what the base URL of emoncms is -->
     <?php global $path; ?>
