@@ -47,7 +47,7 @@ is first converted by a file called .htaccess into:
 
     http://emoncms.org?q=myelectric/view
 
-"myelectric/view" is now the value of the URL property "q" and this argument is passed to index.php wich you will see in the main emoncms folder. 
+"myelectric/view" is now the value of the URL property "q" and this argument is passed to index.php wich you will see in the main emoncms folder. This is then used by index.php which is the front controller to tell the application what to load.
 
 
 ## 3) The view
