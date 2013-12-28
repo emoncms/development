@@ -71,7 +71,7 @@ and create a file called myelectric_view.php in the myelectric module folder, ty
 
 ### Building the power display
 
-Replace the hello world view code with the following HTML which creates the power display (although value wont change for now).
+Replace the hello world view code with the following HTML which creates the power display (although the values wont change for now).
 
     <!-- defenition of the style/look of the elements on our page (CSS stylesheet) -->
     <style>
