@@ -47,7 +47,7 @@ is first converted by a file called .htaccess into:
 
     http://emoncms.org?q=myelectric/view
 
-"myelectric/view" is now the value of the URL property "q" and this argument is passed to index.php wich you will see in the main emoncms folder. 
+"myelectric/view" is now the value of the URL property "q" and this argument is passed to index.php wich you will see in the main emoncms folder. This is then used by index.php which is the front controller to tell the application what to load.
 
 
 ## 3) The view
@@ -71,7 +71,7 @@ and create a file called myelectric_view.php in the myelectric module folder, ty
 
 ### Building the power display
 
-Replace the hello world view code with the following HTML which creates the power display (although value wont change for now).
+Replace the hello world view code with the following HTML which creates the power display (although the values wont change for now).
 
     <!-- defenition of the style/look of the elements on our page (CSS stylesheet) -->
     <style>
@@ -117,7 +117,7 @@ To make the display show an actual power and kwh feed value we need to add a lit
 
 To make this step a little easier the feed module has a library that we can use to request the feed values, which saves us from writting out the AJAX request ourselves. **Note:** this example uses the latest version of the feed.js helper library you may need to update your emoncms installation to get access to the **feed.list_by_id()** function.
 
-Add the following code below the html code above in myelectric_view.php:
+Add the following code just below the html code that you copied above in myelectric_view.php:
 
     <!-- bring in the emoncms path variable which tells this script what the base URL of emoncms is -->
     <?php global $path; ?>
@@ -136,11 +136,11 @@ Add the following code below the html code above in myelectric_view.php:
       $("#kwhd").html(feeds[2].toFixed(1));     // feeds[kwhd-feed-id]
     </script>
 
-Set the feed id's to the id's of your power and kwhd feed.
+**Important:** Set the feed id's to the id's of your power and kwhd feed.
 
 **Try it out:** You should now see the last value of your power and kwh feed but it wont yet be updating periodically. To update the power and kwh value periodically say every 5 seconds we use the javascript setInterval(function,time ms) function. 
 
-Replace the code within the <script> ... </script> tags with the following to have the values update periodically:
+Replace the code within the \<script\> ... \</script\> tags with the following to have the values update periodically:
 
     <script>
 
