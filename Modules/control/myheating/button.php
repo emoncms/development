@@ -15,7 +15,8 @@
 
 <script>
   var path = "<?php echo $path; ?>";
-  var apikey = "";
+  var apikey = "<?php echo $_GET['apikey']; ?>";
+  packetgen.apikey = apikey;
   
   $("body").css('background-color','#222');
   
