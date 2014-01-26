@@ -1,4 +1,6 @@
-<?php global $path; ?>
+<?php global $path; 
+  if (!isset($_GET['apikey'])) $apikey = ""; else $apikey = $_GET['apikey'];
+?>
 
 <script language="javascript" type="text/javascript" src="<?php echo $path; ?>Modules/packetgen/packetgen.js"></script>
 
@@ -15,7 +17,7 @@
 
 <script>
   var path = "<?php echo $path; ?>";
-  var apikey = "<?php echo $_GET['apikey']; ?>";
+  var apikey = "<?php echo $apikey; ?>";
   packetgen.apikey = apikey;
   
   $("body").css('background-color','#222');
