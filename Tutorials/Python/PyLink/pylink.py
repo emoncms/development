@@ -1,4 +1,3 @@
-
 # Read from serial with data coming from RFM12PI with RFM12_Demo sketch
 # All Emoncms code is released under the GNU Affero General Public License.
 
@@ -45,7 +44,7 @@ while 1:
         for i in range(2,(len(values)-1),2):
             # Get 16-bit integer
             value = int(values[i]) + int(values[i+1])*256
-            if value>32768: value -= -65536
+            if value>32768: value -= 65536
             datacsv.append(str(value))
             
         req = "node="+str(nodeid)+"&csv="+','.join(datacsv)
