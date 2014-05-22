@@ -33,7 +33,6 @@ def EmonHub():
             a.stop = True
             b.stop = True
             break
-    
-    
+
 if __name__ == '__main__':
     EmonHub()

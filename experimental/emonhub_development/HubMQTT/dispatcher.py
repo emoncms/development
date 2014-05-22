@@ -1,13 +1,9 @@
 #!/usr/bin/python
 
-import urllib2
-import mosquitto, json, time
+import urllib2, mosquitto, json, time
+from configobj import ConfigObj
 
-url = "http://localhost/emoncms"
-apikey = "70e69594279c6961f2dae34ff1d45f4a"
-
-broker = "127.0.0.1"
-port = 1883
+settings = ConfigObj("emonhub.conf", file_error=True)
 
 databuffer = []
 
@@ -32,8 +28,8 @@ def on_message(mosq, obj, msg):
     print "apikey="+apikey+"&data="+datastr+"&sentat="+str(sentat)
     
     req = urllib2.Request(
-        url+'/node/multiple.json', 
-        "apikey="+apikey+"&data="+datastr+"&sentat="+str(sentat)
+        settings['Server']['url']+'/node/multiple.json', 
+        "apikey="+settings['Server']['apikey']+"&data="+datastr+"&sentat="+str(sentat)
     )
     
     try:
@@ -58,6 +54,6 @@ mqttc.on_message = on_message
 mqttc.on_connect = on_connect
  
 #connect to broker
-mqttc.connect(broker, port, 60, True)
+mqttc.connect(settings['Mosquitto']['broker'], settings['Mosquitto']['port'], 60, True)
 
 mqttc.loop_forever()

@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
 import serial, sys, string, mosquitto, json, time
+from configobj import ConfigObj
 
-broker = "127.0.0.1"
-port = 1883
+settings = ConfigObj("emonhub.conf", file_error=True)
 
-ser = serial.Serial('/dev/ttyUSB0', 9600)
+ser = serial.Serial(settings['Serial']['port'], settings['Serial']['baud'])
 
 mqttc = mosquitto.Mosquitto()
-mqttc.connect(broker, port, 60, True)
+mqttc.connect(settings['Mosquitto']['broker'], settings['Mosquitto']['port'], 60, True)
 
 while 1:
 

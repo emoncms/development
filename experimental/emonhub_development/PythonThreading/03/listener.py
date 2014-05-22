@@ -11,8 +11,6 @@ class Listener(threading.Thread):
         self._settings = settings
         self.stop = False
         
-        
-        
     def run(self):
     
         self._s = serial.Serial(
