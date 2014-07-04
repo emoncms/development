@@ -1,0 +1,45 @@
+<link href="./static/css/style.css" rel="stylesheet">
+<script language="javascript" type="text/javascript" src="./static/js/jquery-1.9.1.min.js"></script>
+<!--[if IE]><script language="javascript" type="text/javascript" src="./static/js/flot/excanvas.min.js"></script><![endif]-->
+<script language="javascript" type="text/javascript" src="./static/js/flot/jquery.flot.min.js"></script>
+<script language="javascript" type="text/javascript" src="./static/js/flot/jquery.flot.time.min.js"></script>
+<script language="javascript" type="text/javascript" src="./static/js/flot/jquery.flot.selection.min.js"></script>
+<script language="javascript" type="text/javascript" src="./static/js/vis.helper.js"></script>
+
+<style>
+#vis-title {
+    font-size:24px;
+    font-weight:bold;
+}
+</style>
+
+<div class="page"> 
+
+<h2>Graph</h2>
+
+<div id="placeholder_bound" style="width:100%; height:500px; position:relative; ">
+    <div id="placeholder" style="position:absolute; top:0px;"></div>
+    <div style="position:absolute; top:18px; left:32px;">
+
+        <div class='btn-group'>
+            <button class='btn time' type='button' time='1'>D</button>
+            <button class='btn time' type='button' time='7'>W</button>
+            <button class='btn time' type='button' time='30'>M</button>
+            <button class='btn time' type='button' time='365'>Y</button>
+        </div>
+
+        <div class='btn-group'>
+            <button id='zoomin' class='btn' >+</button>
+            <button id='zoomout' class='btn' >-</button>
+            <button id='left' class='btn' ><</button>
+            <button id='right' class='btn' >></button>
+        </div>
+
+    </div>
+
+    <h3 style="position:absolute; top:0px; right:25px;"><span id="stats"></span></h3>
+</div>
+
+</div>
+
+<script src="./static/js/graph.js"></script>

@@ -1,0 +1,42 @@
+
+body {
+    font-family:Arial;
+    background-color:#efefef;
+    margin:0px;
+}
+
+.page {
+    margin: 0px auto; 
+    max-width:960px; 
+    padding:20px;
+    background-color:#fff;
+}
+
+table.cleanlist {
+  width: 100%;
+  border: 1px solid #DFDFDF;
+  border-spacing: 0;
+  border-bottom: 0px;
+  empty-cells:show;
+}
+
+table.cleanlist td {
+  padding: 5px;
+  line-height: 30px;
+  font-size:14px;
+  border-bottom: 1px solid #DFDFDF;
+  border-top: 1px solid #FFFFFF;
+}
+
+table.cleanlist tr.dark td {
+  background-color: #f8f8f8;
+}
+
+table.cleanlist tr.light td {
+  background-color: #fcfcfc;
+}
+
+a {
+    text-decoration:none;
+    color: #0699c8;
+}
