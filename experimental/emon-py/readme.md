@@ -17,7 +17,7 @@ Input stage uses the emonhub serial listener and node decoder written by Jérôm
 
 [RaspberryPI Installation](docs/install.md)
 
-### System diagram, Delayed Allocation
+### System diagram, Write buffering
 
 ![System diagram](docs/images/emon-py-system-diagram.png)
                              
@@ -29,6 +29,8 @@ Input stage uses the emonhub serial listener and node decoder written by Jérôm
 ### Write performance 
 
 To put the figures below in context the standard emoncms write load on an ext4 partition with a mix of phpfiwa, phpfina and phptimeseries feeds before any of the optimisations implemented here are applied is ~30 kb\_wrtn/s. With a mix of PHPTimestore and MYSQL histograms and daily data the write load was measured as high as 197 kb_wrtn/s. These developments therefore give a significant write rate reduction.
+
+[Full investigation into improving write performance with write buffering](https://github.com/openenergymonitor/documentation/blob/master/BuildingBlocks/TimeSeries/writeloadinvestigation.md)
 
 ### (vFAT)
 
