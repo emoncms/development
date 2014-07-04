@@ -1,4 +1,4 @@
-## Raspberrypi install
+## Emon-py Raspberrypi install
 
 You will need:
 - SD Card with 4GB or larger capacity.
@@ -25,7 +25,7 @@ Write the raspbian image to the SD card (Make sure of=/dev/sdb is the correct lo
     
     sudo dd bs=4M if=2014-01-07-wheezy-raspbian.img of=/dev/sdb
     
-Open the SD Card in GParted and format the unallocated 899 MiB disk space as a FAT16 Drive. 
+**Open the SD Card in GParted and format the unallocated 899 MiB disk space as a FAT16 Drive** 
 
 Once uploaded to the SD card, insert the SD card into the raspberrypi and power the pi up.
 
@@ -57,20 +57,12 @@ replace the line:
 with:
 
     dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait
+    
+Create a directory that will be a mount point for the rw data partition
 
-Reboot the pi so that this will take effect:
+    mkdir /home/pi/data
 
-    sudo reboot
-
-Next we will install git and python gateway dependencies
-
-    sudo apt-get update
-    sudo apt-get install git-core python-serial python-configobj
-
-
-
-
-
+    
 ## Read only mode
 
 Configure Raspbian to run in read-only mode for increased stability (optional but recommended)
@@ -88,6 +80,7 @@ Then run these commands to make changes to filesystem
     sudo sh -c "echo 'proc            /proc           proc    defaults                              0    0' >> /etc/fstab"
     sudo sh -c "echo '/dev/mmcblk0p1  /boot           vfat    defaults                              0    2' >> /etc/fstab"
     sudo sh -c "echo '/dev/mmcblk0p2  /               ext4    defaults,ro,noatime,errors=remount-ro 0    1' >> /etc/fstab"
+    sudo sh -c "echo '/dev/mmcblk0p3  /home/pi/data   vfat    defaults,user,rw,umask=000,noatime    0    2' >> /etc/fstab"
     sudo sh -c "echo ' ' >> /tmp/fstab"
     sudo mv /etc/mtab /etc/mtab.orig
     sudo ln -s /proc/self/mounts /etc/mtab
@@ -129,3 +122,75 @@ save and exit using ctrl-x -> y -> enter and then to make this executable run
 Lastly reboot for changes to take effect
 
     sudo shutdown -r now
+    
+    
+
+Next we will install git and python gateway dependencies
+
+    ipe-rw
+
+    sudo apt-get update
+    sudo apt-get install screen sysstat git-core python-serial python-configobj redis-server python-pip
+    
+    sudo pip install redis
+    sudo pip install web.py
+    
+Configure redis to run without logging or data persistance.
+
+    sudo nano /etc/redis/redis.conf
+
+comment out redis log file
+
+    # logfile /var/log/redis/redis-server.log
+
+comment out all redis saving
+
+    # save 900 1
+    # save 300 10
+    # save 60 10000
+    
+    sudo /etc/init.d/redis-server start
+
+Install emon-py:
+    
+    git clone https://github.com/emoncms/development.git
+    cd development/experimental/emon-py
+    cp default.emon-py.conf emon-py.conf
+    
+Run emon-py using 3 screen's:
+    
+    screen
+    python listener.py
+    ctrl a+d
+    
+    screen
+    python server.py
+    ctrl a+d
+    
+    screen
+    python writer.py
+    ctrl a+d
+    
+Test write rate:
+    
+    sudo iostat 60
+    
+With 20x 10s feeds and 25x 60s feeds and a commit rate of 60s the kb_wrtn/s rate should be around 0.4:
+
+    avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+               2.26    0.00    0.57    0.00    0.00   97.16
+
+    Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+    mmcblk0           0.79         0.20         0.42         12         25
+
+    avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+               2.40    0.00    0.54    0.00    0.00   97.07
+
+    Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+    mmcblk0           0.77         0.00         0.44          0         26
+
+    avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+               2.17    0.00    0.52    0.02    0.00   97.30
+
+    Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+    mmcblk0           0.82         2.35         0.42        140         25
