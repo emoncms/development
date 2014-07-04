@@ -2,6 +2,8 @@
 
 A minimal implementation of an emoncms like web application for energy and environment monitoring writen in python.
 
+![emon-py frontend nodelist](docs/images/emon-py.png)
+
 - Input stage uses the emonhub serial listener and node decoder written by Jérôme Lafréchoux and Paul Burnell (pb66)
 
 ## Installation
