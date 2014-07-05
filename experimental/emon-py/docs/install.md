@@ -81,7 +81,7 @@ Then run these commands to make changes to filesystem
     sudo sh -c "echo '/dev/mmcblk0p1  /boot           vfat    defaults                              0    2' >> /etc/fstab"
     sudo sh -c "echo '/dev/mmcblk0p2  /               ext4    defaults,ro,noatime,errors=remount-ro 0    1' >> /etc/fstab"
     sudo sh -c "echo '/dev/mmcblk0p3  /home/pi/data   vfat    defaults,user,rw,umask=000,noatime    0    2' >> /etc/fstab"
-    sudo sh -c "echo ' ' >> /tmp/fstab"
+    sudo sh -c "echo ' ' >> /etc/fstab"
     sudo mv /etc/mtab /etc/mtab.orig
     sudo ln -s /proc/self/mounts /etc/mtab
     
