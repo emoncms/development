@@ -49,4 +49,4 @@ while 1:
     
     print "Bytes written: " + str(bytes)
 
-    time.sleep(settings['data']['saveinterval'])
+    time.sleep(float(settings['data']['saveinterval']))

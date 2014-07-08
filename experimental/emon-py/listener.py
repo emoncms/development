@@ -38,17 +38,18 @@ while 1:
     elif received[0] == '?':
         # self._log.warning("Misformed RX frame: " + str(received))
         pass
-    elif received[0] == 'OK':
-    
+    else:
+        if received[0]=='OK':
+            received = received[1:]
+
         if settings['serial']['radio']=='rfm69':
-            bytepart = received[1:-1]
+            bytepart = received[:-1]
             # Extract rssi
             rssi = -1 * int(received[-1][1:-1])
-            
         else:
-            bytepart = received[1:]
+	    bytepart = received
             rssi = 0
-        
+
         try:
             # Only integers are expected
             bytepart = [int(val) for val in bytepart]
