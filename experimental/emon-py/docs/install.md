@@ -127,7 +127,7 @@ Lastly reboot for changes to take effect
 
 Next we will install git and python gateway dependencies
 
-    ipe-rw
+    rpi-rw
 
     sudo apt-get update
     sudo apt-get install screen sysstat git-core python-serial python-configobj redis-server python-pip
@@ -156,6 +156,10 @@ Install emon-py:
     git clone https://github.com/emoncms/development.git
     cd development/experimental/emon-py
     cp default.emon-py.conf emon-py.conf
+    
+Switch back to read only mode:
+    
+    rpi-ro
     
 Run emon-py using 3 screen's:
     
