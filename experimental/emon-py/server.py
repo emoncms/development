@@ -19,8 +19,8 @@ nodelist = settings['nodes']
 
 r = redis.Redis(
     host=settings['redis']['host'], 
-    port=settings['redis']['port'], 
-    db=settings['redis']['db']
+    port=int(settings['redis']['port']), 
+    db=int(settings['redis']['db'])
 )
 
 pyfina = pyfina(settings['data']['dir'])
