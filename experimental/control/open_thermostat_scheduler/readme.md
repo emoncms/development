@@ -7,17 +7,48 @@ This is work in progress - it has not yet reached a working first release state
 
 **rfmpi2mqtt.py** – the bridge between serial IO of rfmpi and MQTT.
 
-Node data received is decoded according to config file and posted to rx mqtt topic:
+### RX
+Node data received is decoded according to config file and posted to rx MQTT topic & redis db
 
-	18,0,0,0,0:
+1) Received on serial:
+
+	18,58,7,228,12
+	
+2) Decoded using config file:
+	
+	[nodes]
+
+    [[18]]
+        nodename = room
+        names = temperature, battery
+        codes = h, h
+        units = C,V
+        scale = 0.01,0.001
+        
+3) Output published to MQTT topic:
+	
 	*rxtopic/nodename/varname*
-	rx/room/temperature		0
-	rx/room/battery			0
+	rx/room/temperature		18.5
+	rx/room/battery			3.30
+	
 
+### TX
 Data can be sent out on rfm network by publishing messages to the tx mqtt topic:
 
-	*txtopic/nodename/varname*
-	tx/heating/state			1
+	*txtopic/nodename*  csv variables
+	tx/heating			1,1810
+	
+2) Encoded using config file:
+
+    [[30]]
+        nodename = heating
+        names = state, setpoint
+        codes = b, h
+        
+3) Serial write command to rfmpi:
+
+    30,1,18,7,s
+
 
 is encoded using config file.
 
