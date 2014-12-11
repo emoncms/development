@@ -1,5 +1,10 @@
 # Heating controller software development
 
+This is work in progress - it has not yet reached a working first release state
+
+## Development Notes:
+
+
 **rfmpi2mqtt.py** – the bridge between serial IO of rfmpi and MQTT.
 
 Node data received is decoded according to config file and posted to rx mqtt topic:
