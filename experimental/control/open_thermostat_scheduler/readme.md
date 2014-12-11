@@ -33,7 +33,8 @@ Node data received is decoded according to config file and posted to rx MQTT top
 	
 
 ### TX
-Data can be sent out on rfm network by publishing messages to the tx mqtt topic:
+
+1) Data can be sent out on rfm network by publishing messages to the tx mqtt topic:
 
 	*txtopic/nodename*  csv variables
 	tx/heating			1,1810
@@ -49,8 +50,6 @@ Data can be sent out on rfm network by publishing messages to the tx mqtt topic:
 
     30,1,18,7,s
 
-
-is encoded using config file.
 
 **heating.html** - The scheduler interface provides a UI that generates a schedule object detailing the heating schedule for every day of the week. The heating schedule can be overridden with a manual setpoint and heating state in manual mode. The variables required for this application are:
     
