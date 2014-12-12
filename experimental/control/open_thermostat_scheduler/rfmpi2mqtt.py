@@ -27,6 +27,9 @@ def on_message(mosq, obj, msg):
                 bytedata = []
                 vararray = msg.payload.split(",")
                 
+                #for var in vararray:
+                #    r.set("tx:%s:%s" % (topic_parts[1], var),var)
+                
                 x=0
                 for code in ehc.nodelist[nodeid]["codes"]:
                     tmp = struct.pack(code,int(vararray[x])) # fix, add parse float if float

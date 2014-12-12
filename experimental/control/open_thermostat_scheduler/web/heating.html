@@ -210,8 +210,13 @@ var today = days[now.getDay()];
 // DATA
 //=================================================
 var nodes = {};
-var state = 0;
 var setpoint = 18.0;
+
+var heating = {
+    state: 0,
+    manualsetpoint: 18,
+    mode: 'manual'
+};
 
 var schedule = {};
 
@@ -248,7 +253,6 @@ var mousedown = 0;
 var slider_width = $(".slider").width();
 var slider_height = $(".slider").height();
 var changed = 0;
-var manual_heating = 1;
 $("#manual_heating").css("background-color","#ff9600");
 
 $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
@@ -270,8 +274,9 @@ function updateclock()
     {
         if (schedule[today][z].start<=timenow && schedule[today][z].end>timenow)
         {
-            if (!manual_heating) {
+            if (heating.mode=="schedule") {
                 setpoint = schedule[today][z].setpoint*1;
+                heating.manualsetpoint = setpoint;
                 $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
                 current_key = z;
             }
@@ -300,31 +305,39 @@ function update()
 }
 
 $("#toggle").click(function(){
-    state ++;
-    if (state>1) state =0;
-    if (state==1) {$("#toggle").html("ON"); $(this).css("background-color","#ff9600"); }
-    if (state==0) {$("#toggle").html("OFF"); $(this).css("background-color","#555"); }
+    heating.state ++;
+    if (heating.state>1) heating.state =0;
+    if (heating.state==1) {$("#toggle").html("ON"); $(this).css("background-color","#ff9600"); }
+    if (heating.state==0) {$("#toggle").html("OFF"); $(this).css("background-color","#555"); }
 
-    $.ajax({ url: "api/send/heating/"+state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    
+    save("app/heating/state",heating.state);
 });
 
 $("#zone-setpoint-dec").click(function(){
     $(".heatingmode").css("background-color","#555");
     $("#manual_heating").css("background-color","#ff9600");
-    manual_heating = 1;
+    heating.mode = "manual";
+    heating.manualsetpoint -= 0.1;
     setpoint -= 0.1;
     $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
-    $.ajax({ url: "api/send/heating/"+state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    
+    save("app/heating",JSON.stringify(heating));
 });
 
 $("#zone-setpoint-inc").click(function(){
     $(".heatingmode").css("background-color","#555");
     $("#manual_heating").css("background-color","#ff9600");
-    manual_heating = 1;
+    heating.mode = "manual";
+    heating.manualsetpoint += 0.1;
     setpoint += 0.1;
     $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
     
-    $.ajax({ url: "api/send/heating/"+state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
+    
+    save("app/heating",JSON.stringify(heating));
 });
 
 // ============================================
@@ -358,7 +371,7 @@ $("body").on("mousedown",".slider-button", function(e){mousedown = 1; key=$(this
 $("body").mouseup(function(e){
     mousedown = 0;
     if (changed) {
-        schedule_save();
+        save("app/heating/schedule",JSON.stringify(schedule));
         changed = 0;
     }
 });
@@ -374,7 +387,7 @@ $("body").on("touchstart",".slider-button", function(e){mousedown = 1; key=$(thi
 $("body").on("touchend","body",function(e){
     mousedown = 0;
     if (changed) {
-        schedule_save();
+        save("app/heating/schedule",JSON.stringify(schedule));
         changed = 0;
     }
 });;
@@ -398,7 +411,7 @@ $("body").on("click",".slider-button", function(){
         schedule[day].splice(key,1);
         draw_day_slider(day);
         //editmode = 'move';
-        schedule_save();
+        save("app/heating/schedule",JSON.stringify(schedule));
     }
 });
 
@@ -427,7 +440,7 @@ $("body").on("click",".slider-segment", function(e){
             
             draw_day_slider(day);
             $("#average_temperature").html(calc_average_schedule_temperature().toFixed(1));
-            schedule_save();
+            save("app/heating/schedule",JSON.stringify(schedule));
         }
         //editmode = 'move';
     }
@@ -494,7 +507,7 @@ $("body").on("click","#slider-segment-ok", function(){
     }
     $("#slider-segment-end").val(format_time(schedule[day][key].end));
     update_slider_ui(day,key+1);
-    schedule_save();
+    save("app/heating/schedule",JSON.stringify(schedule));
     updateclock();
 
 });
@@ -510,7 +523,7 @@ $("#slider-segment-movepos-ok").click(function(){
     }
     $("#slider-segment-time").val(format_time(schedule[day][key].start));  
     update_slider_ui(day,key);
-    schedule_save();
+    save("app/heating/schedule",JSON.stringify(schedule));
 });
 
 $("#mode-split").click(function(){
@@ -535,14 +548,16 @@ $("#mode-merge").click(function(){
 $("#manual_heating").click(function(){
     $(".heatingmode").css("background-color","#555");
     $(this).css("background-color","#ff9600");
-    manual_heating = 1;
+    heating.mode = "manual";
+    save("app/heating/mode",heating.mode);
     updateclock();
 });
 
 $("#scheduled_heating").click(function(){
     $(".heatingmode").css("background-color","#555");
     $(this).css("background-color","#ff9600");
-    manual_heating = 0;
+    heating.mode = "schedule";
+    save("app/heating/mode",heating.mode);
     updateclock();
 });
 
@@ -625,9 +640,9 @@ function calc_average_schedule_temperature()
     return sum / (24*7.0);
 }
 
-function schedule_save()
+function save(topic,payload)
 {
-    $.ajax({ type:'POST', url: "api/schedule/set", data: "schedule="+JSON.stringify(schedule), dataType: 'json', async: true });
+    $.ajax({ type:'POST', url: "api/"+topic+"/set", data: "val="+payload, dataType: 'json', async: true });
 }
 
 

@@ -22,9 +22,9 @@
     
     // 3) Parse query string
     $q = $_GET['q'];
+    
     $parts = explode("/",$q);
     
-   
     switch ($parts[0]) {
     
         case "nodes":
@@ -70,17 +70,56 @@
             print "ok";
             break;
             
-       case "schedule":
+       case "app":
+            $method = $parts[count($parts)-1];
+            $copy = $parts;
+            unset($copy[count($parts)-1]);
+            $key = implode("/",$copy);
        
-            if ($parts[1]=="get")
-            {
-                print $redis->get("schedule");
+            if ($method=="get") {
+            
+                if ($key=="app/heating") {
+                    
+                }
+                
+                if ($key=="app/heating/state") print $redis->get("app/heating/state");
+                if ($key=="app/heating/manualsetpoint") print $redis->get("app/heating/manualsetpoint");
+                if ($key=="app/heating/mode") print $redis->get("app/heating/mode");
+                if ($key=="app/heating/schedule") print $redis->get("app/heating/schedule");
             }
             
-            if ($parts[1]=="set" && isset($_POST['schedule']))
-            {
-                print $_POST['schedule'];
-                $schedule = stripslashes(json_encode(json_decode($_POST['schedule'])));
-                $redis->set("schedule",$schedule);
+            if ($method=="set") {
+            
+                if ($key=="app/heating") {
+                    $heating = json_decode(prop('val'));
+                    if (isset($heating->state)) save("app/heating/state",$heating->state);
+                    if (isset($heating->manualsetpoint)) save("app/heating/manualsetpoint",$heating->manualsetpoint);
+                    if (isset($heating->mode)) save("app/heating/mode",$heating->mode);
+                    if (isset($heating->schedule)) save("app/heating/schedule",$heating->schedule);
+                    print "ok";
+                }
+                
+                if ($key=="app/heating/state") save("app/heating/state",prop('val'));
+                if ($key=="app/heating/manualsetpoint") save("app/heating/manualsetpoint",prop('val'));
+                if ($key=="app/heating/mode") save("app/heating/mode",prop('val'));
+                if ($key=="app/heating/schedule") save("app/heating/schedule",prop('val'));
             }
+    }
+    
+    function prop($index)
+    {
+        $val = null;
+        if (isset($_GET[$index])) $val = $_GET[$index];
+        if (isset($_POST[$index])) $val = $_POST[$index];
+        if (get_magic_quotes_gpc()) $val = stripslashes($val);
+        return $val;
+    }
+    
+    function save($topic,$payload) {
+        global $redis, $mqtt;
+        $redis->set($topic,$payload);
+        if ($mqtt->connect()) {
+            $mqtt->publish($topic,$payload,0);
+            $mqtt->close();
+        }
     }

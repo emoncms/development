@@ -1,44 +1,67 @@
-import mosquitto, time, json
-import redis
-import datetime
+import mosquitto, time, json, redis, datetime
+
+setpoint = 0
+days = ['mon','tue','wed','thu','fri','sat','sun']
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-data = {}
-state = 0
-setpoint = 1234
+heating = {}
+heating['state'] = r.get("app/heating/state")
+heating['manualsetpoint'] = r.get("app/heating/manualsetpoint")
+heating['mode'] = r.get("app/heating/mode")
+heating['schedule'] = json.loads(r.get("app/heating/schedule"))
+
+def on_message(mosq, obj, msg):
+    
+    if msg.topic=="app/heating/state":
+        heating['state'] = msg.payload
+        
+    if msg.topic=="app/heating/manualsetpoint":
+        heating['manualsetpoint'] = msg.payload
+        
+    if msg.topic=="app/heating/mode":
+        heating['mode'] = msg.payload
+            
+    if msg.topic=="app/heating/schedule":
+        heating['schedule'] = json.loads(msg.payload)
+            
+    update()
     
 mqttc = mosquitto.Mosquitto()
+mqttc.on_message = on_message
 mqttc.connect("127.0.0.1",1883, 60, True)
+mqttc.subscribe("app/#", 0)
 
-schedule = r.get("schedule")
-schedule = json.loads(schedule)
-
-setpoint = 0
-state = 1
-
-days = ['mon','tue','wed','thu','fri','sat','sun']
-
-while 1:
-
-    manual_state = r.get("state")
-    manual_setpoint = r.get("setpoint")
-    manual_heating = r.get("manual_heating")
-    
-    schedule = r.get("schedule")
-    schedule = json.loads(schedule)
+def update():
+    global setpoint
     
     t = datetime.datetime.now().time()
     timenow = t.hour + (t.minute/60.0)
     today = days[datetime.datetime.today().weekday()]
+    lastsetpoint = setpoint
     
-    current_key = 0
-    for period in schedule[today]:
+    if heating['mode']=="manual":
+        setpoint = float(heating['manualsetpoint'])
+    
+    for period in heating['schedule'][today]:
         if period['start']<=timenow and period['end']>timenow:
-            if not manual_heating:
-                setpoint = period['setpoint']
-           
-    print setpoint
+            if heating['mode']=="schedule":
+                setpoint = float(period['setpoint'])
     
-    mqttc.publish('tx/heating',str(state)+","+str(setpoint*100))
-    time.sleep(5.0);
+    if lastsetpoint!=setpoint and heating['mode']=="schedule":
+        print "tx/heating "+str(heating['state'])+","+str(int(setpoint*100))
+        mqttc.publish('tx/heating',str(heating['state'])+","+str(int(setpoint*100)))
+    
+t = 0
+lt = 0
+
+update()
+while 1:
+    mqttc.loop(0)
+    
+    if (t-lt)>10.0:
+        lt = t
+        update()
+        
+    time.sleep(0.1)
+    t = t + 0.1
