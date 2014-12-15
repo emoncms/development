@@ -58,12 +58,13 @@ Bridge between serial IO of rfmpi and MQTT based on emonhub.
 
 The scheduler interface provides a UI that generates a schedule object detailing the heating schedule for every day of the week. The heating schedule can be overridden with a manual setpoint and heating state in manual mode. The variables required for this application are:
     
-	heating_state			    on/off
-	heating_manual_setpoint		<temperature>		
-	heating_mode			    manual/schedule
-	heating_schedule			<schedule object>
+    	js object:			value				redis/mqtt topic key
+	heating.state			1/0				app/heating/state
+	heating.manualsetpoint		<temperature>			app/heating/manualsetpoint
+	heating.mode			manual/schedule			app/heating/mode
+	heating.schedule		<schedule json>			app/heating/schedule
 
-These variables need to be persisted in the server database – (ideally persisted to disk, at the moment the app is using redis which can be configured to persist but its not ideal as you don’t want to persist the regularly updated node data – to reduce disk writes)
+These variables are stored in redis and state changes are published to MQTT under topic names listed above
 
 ### runschedule.py 
 
