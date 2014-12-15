@@ -108,3 +108,26 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 - Watchdog for service scripts
 - Extend heating.html to allow multi-zone control
 - Develop android app version of heating.html
+
+# Development questions
+
+In the implementation above node data is published to a MQTT topic key for each node/variable. This works ok for transfering data locally between scripts but if we wanted to dispatch node data to a remote emoncms account translating a mqtt variable update to a http request to emoncms.org for every single input would not be the most efficient way of sending data and would multiply the connection load on emoncms.org considerably. At the moment emonhub has a dispatcher that buffers node data which can in turn contain many node variables. It might be nice to hang dispatchers off the MQTT rx/node/variable bus but to then dispatch an efficient message would require recombination of the individual variables into nodes and would have associated challenges with defining which variable to trigger dispatching with. Perhaps another MQTT topic is required which holds this node data without it having being split into sperate variables:
+
+    bulkdata = [
+    	{"time":0, "node":"room", "var":{"temperature":18.5, "battery":3.3}}
+        {"time":5, "node":"room", "var":{"temperature":18.5, "battery":3.3}}
+        {"time":10, "node":"room", "var":{"temperature":18.5, "battery":3.3}}
+    ]
+
+or perhaps a dispatcher could create bulk uploads of full keys:
+
+    bulkdata = {
+        "room/temperature":{"time":0,"val":18.5},
+        "room/battery":{"time":0,"val":3.3},
+        "room/temperature":{"time":5,"val":18.5},
+        "room/battery":{"time":5,"val":3.3},
+        "room/temperature":{"time":10,"val":18.5},
+        "room/battery":{"time":10,"val":3.3}
+    }
+
+Im not sure it is as nice a solution as the current approach.
