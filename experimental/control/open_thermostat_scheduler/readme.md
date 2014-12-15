@@ -1,6 +1,6 @@
-# Heating controller software development
+# Heating controller software development v0.1
 
-This is work in progress - it has not yet reached a working first release state
+This software is work in progress and while the inital release has been tested to be basically functional there are still lots of parts to it that are missing: authentication, service scripts, etc see todo list below.
 
 ![topgraphic.png](docs/topgraphic.png)
 
