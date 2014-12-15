@@ -10,7 +10,7 @@ This software is work in progress and while the inital release has been tested t
 
 ### rfmpi2mqtt.py
 
-Bridge between serial IO of rfmpi and MQTT based on emonhub.
+Bridge between serial IO of rfmpi and MQTT based on @pb66's emonhub decoder.
 
 **RX:** Node data received is decoded according to config file and posted to rx MQTT topic & redis db
 
@@ -165,6 +165,21 @@ The redis database can be configured to persist to disk every x key update or to
 ### Command routing
 
 In the implementation above the scheduler interface can send manual heating commands directly to rfmpi2mqtt.py via api.php in addition to sending heating schedule settings changes to runschedule.py. In the event that runschedule.py crashes/fails this provides a failure mode that still allows manual control of the heating. The alternative is that all commands go via runschedule.py which then in turn sends commands to rfmpi2mqtt.py, is there an event where commands could be simultaneously sent by runsheduler.py and directly causing the program to get into a 'mixed' state?
+
+### Server API
+
+While developing the server side component that provides a HTTP interface for heating.html to access data in MQTT and Redis I tried a couple of different ideas. My ideal API I think would provide several options so that in addition to being able to fetch a single variable by its key:
+
+GET http://localhost/api/rx/room/temperature
+
+It would also be possible to request the entire node or even all the nodes by going along the hierarchy. 
+
+GET http://localhost/api/rx/room -> {"temperature":18.5, "battery":3.3}
+GET http://localhost/api/rx      -> {"room":{"temperature":18.5, "battery":3.3}}
+
+The code to do this gets complex fast resulting in much harder to read and understand code, so in the end I decided to revert to the simple full key approach. It would be great however to achieve this fuller API if a more elgant solution could be found
+
+
 
 ### Remote emoncms dispatchers
 
