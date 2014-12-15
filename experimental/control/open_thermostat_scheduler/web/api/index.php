@@ -20,100 +20,65 @@
     $redis = new Redis();
     $redis->connect("127.0.0.1");
     
+    $method = $_SERVER['REQUEST_METHOD'];
+
+    $keys = array(
+        "node/room/temperature"=>array("type"=>"float"),
+        "node/room/battery"=>array("type"=>"int"),
+        
+        "tx/heating"=>array("type"=>"csv"),
+        
+        "app/heating/state"=>array("type"=>"bool"),
+        "app/heating/mode"=>array("type"=>"text","options"=>array("manual","schedule")),
+        "app/heating/setpoint"=>array("type"=>"float"),
+        "app/heating/schedule"=>array("type"=>"json")
+    );
+    
     // 3) Parse query string
     $q = $_GET['q'];
-    
     $parts = explode("/",$q);
-    
-    switch ($parts[0]) {
-    
-        case "nodes":
-            switch (count($parts)) {
-                case 1:
-                    // if length = 1: load all nodes
-                    // http://localhost/api/nodes -> {"room":{"battery":3.12,"temperature":18.12}}
-                    $nodes = array();
-                    foreach ($redis->keys("node:*") as $key) {
-                        $keyparts = explode(":",$key);
-                        $nodename = $keyparts[1];
-                        $varname = $keyparts[2];
-                        if (!isset($nodes[$nodename])) $nodes[$nodename] = array();
-                        $nodes[$nodename][$varname] = $redis->get($key)*1;
-                    }
-                    print json_encode($nodes);
-                    break;
-                case 2:
-                    // if length = 2: load all variables for node
-                    // http://localhost/api/nodes/room -> {"battery":3.12,"temperature":18.12}
-                    $node = array();
-                    foreach ($redis->keys("node:".$parts[1].":*") as $key) {
-                        $varname = str_replace("node:".$parts[1].":","",$key);
-                        $node[$varname] = $redis->get($key)*1;
-                    }
-                    print json_encode($node);
-                    break;
-                case 3:
-                    // if length = 3: load variable of node
-                    // http://localhost/api/nodes/room/temperature -> 18.12
-                    print $redis->get("node:".$parts[1].":".$parts[2]);
-                    break;
+   
+    switch ($method) {
+        case "GET":
+          
+            if (isset($keys[$q])) {
+                //print "GET ".$q." = ";
+                print $redis->get($q);
+            } else {
+                print "ERROR key not recognised";
             }
+            
             break;
-            
-        case "send":
-            // http://localhost/api/send/light/1 -> ok
-            if ($mqtt->connect()) {
-                // print "tx/".$parts[1]." ".$parts[2];
-                $mqtt->publish("tx/".$parts[1],$parts[2],0);
-                $mqtt->close();
-            }
-            print "ok";
-            break;
-            
-       case "app":
-            $method = $parts[count($parts)-1];
-            $copy = $parts;
-            unset($copy[count($parts)-1]);
-            $key = implode("/",$copy);
-       
-            if ($method=="get") {
-            
-                if ($key=="app/heating") {
-                    
+        
+        case "POST":
+            if (isset($keys[$q])) 
+            {
+                $valid = true;
+                $value = file_get_contents('php://input');
+                if ($keys[$q]["type"]=="float") $value = (float) $value;
+                if ($keys[$q]["type"]=="int") $value = (int) $value;
+                if ($keys[$q]["type"]=="bool") $value = (int) (boolean) $value;
+                if ($keys[$q]["type"]=="json") $value = json_encode(json_decode($value));
+                if ($keys[$q]["type"]=="text" && !in_array($value,$keys[$q]["options"])) $valid = false;
+                if ($keys[$q]["type"]=="csv") {
+                    $values = explode(",",$value);
+                    for ($i=0; $i<count($values); $i++) $values[$i] = (float) $values[$i];
+                    $value = implode(",",$values);
                 }
                 
-                if ($key=="app/heating/state") print $redis->get("app/heating/state");
-                if ($key=="app/heating/manualsetpoint") print $redis->get("app/heating/manualsetpoint");
-                if ($key=="app/heating/mode") print $redis->get("app/heating/mode");
-                if ($key=="app/heating/schedule") print $redis->get("app/heating/schedule");
-            }
-            
-            if ($method=="set") {
-            
-                if ($key=="app/heating") {
-                    $heating = json_decode(prop('val'));
-                    if (isset($heating->state)) save("app/heating/state",$heating->state);
-                    if (isset($heating->manualsetpoint)) save("app/heating/manualsetpoint",$heating->manualsetpoint);
-                    if (isset($heating->mode)) save("app/heating/mode",$heating->mode);
-                    if (isset($heating->schedule)) save("app/heating/schedule",$heating->schedule);
-                    print "ok";
+                if ($valid) {
+                    //print "POST ".$q." <= ".$value;
+                    save($q,$value);
+                } else {
+                    print "ERROR value not valid";
                 }
-                
-                if ($key=="app/heating/state") save("app/heating/state",prop('val'));
-                if ($key=="app/heating/manualsetpoint") save("app/heating/manualsetpoint",prop('val'));
-                if ($key=="app/heating/mode") save("app/heating/mode",prop('val'));
-                if ($key=="app/heating/schedule") save("app/heating/schedule",prop('val'));
+            } else {
+                print "ERROR key not recognised";
             }
+            break;
     }
     
-    function prop($index)
-    {
-        $val = null;
-        if (isset($_GET[$index])) $val = $_GET[$index];
-        if (isset($_POST[$index])) $val = $_POST[$index];
-        if (get_magic_quotes_gpc()) $val = stripslashes($val);
-        return $val;
-    }
+    print "\n\n";
     
     function save($topic,$payload) {
         global $redis, $mqtt;

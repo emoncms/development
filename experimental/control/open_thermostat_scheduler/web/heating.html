@@ -210,6 +210,7 @@ var today = days[now.getDay()];
 // DATA
 //=================================================
 var nodes = {};
+var room_temperature = 0;
 var setpoint = 18.0;
 
 var heating = {
@@ -236,9 +237,8 @@ schedule['fri'] = JSON.parse(JSON.stringify(day1));
 schedule['sat'] = JSON.parse(JSON.stringify(day1));
 schedule['sun'] = JSON.parse(JSON.stringify(day1));
 
-$.ajax({ url: "api/schedule/get", data: "", dataType: 'json', async: false, success: function(data){
-    if (data.length!=0) schedule = data;
-}});
+schedule = server_get("app/heating/schedule");
+heating.state = server_get("app/heating/state");
 
 var maxc = 21;
 var minc = 5;
@@ -297,11 +297,9 @@ function updateclock()
 
 function update()
 {
-    $.ajax({ url: "api/nodes", data: "", dataType: 'json', async: false, success: function(data){
-        nodes = data;
-    }});
+    room_temperature = server_get("node/room/temperature");
     
-    $(".zone-temperature").html(nodes.room.temperature.toFixed(1)+"&deg;C");
+    $(".zone-temperature").html(room_temperature.toFixed(1)+"&deg;C");
 }
 
 $("#toggle").click(function(){
@@ -310,8 +308,7 @@ $("#toggle").click(function(){
     if (heating.state==1) {$("#toggle").html("ON"); $(this).css("background-color","#ff9600"); }
     if (heating.state==0) {$("#toggle").html("OFF"); $(this).css("background-color","#555"); }
 
-    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
-    
+    save("tx/heating",heating.state+","+parseInt(setpoint*100));
     save("app/heating/state",heating.state);
 });
 
@@ -322,9 +319,10 @@ $("#zone-setpoint-dec").click(function(){
     heating.manualsetpoint -= 0.1;
     setpoint -= 0.1;
     $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
-    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
     
-    save("app/heating",JSON.stringify(heating));
+    save("tx/heating",heating.state+","+parseInt(setpoint*100));
+    save("app/heating/mode",heating.mode);
+    save("app/heating/manualsetpoint",heating.manualsetpoint);
 });
 
 $("#zone-setpoint-inc").click(function(){
@@ -335,9 +333,9 @@ $("#zone-setpoint-inc").click(function(){
     setpoint += 0.1;
     $(".zone-setpoint").html(setpoint.toFixed(1)+"&deg;C");
     
-    $.ajax({ url: "api/send/heating/"+heating.state+","+parseInt(setpoint*100), data: "", dataType: 'json', async: false, success: function(data){}});
-    
-    save("app/heating",JSON.stringify(heating));
+    save("tx/heating",heating.state+","+parseInt(setpoint*100));
+    save("app/heating/mode",heating.mode);
+    save("app/heating/manualsetpoint",heating.manualsetpoint);
 });
 
 // ============================================
@@ -642,7 +640,16 @@ function calc_average_schedule_temperature()
 
 function save(topic,payload)
 {
-    $.ajax({ type:'POST', url: "api/"+topic+"/set", data: "val="+payload, dataType: 'json', async: true });
+    $.ajax({ type:'POST', url: "api/"+topic, data: payload, async: true });
+}
+
+function server_get(topic)
+{
+    var output = {};
+    $.ajax({ url: "api/"+topic, dataType: 'json', async: false, success: function(data){
+        if (data.length!=0) output = data;
+    }});
+    return output;
 }
 
 
