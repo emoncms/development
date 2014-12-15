@@ -8,7 +8,6 @@ This software is work in progress and while the inital release has been tested t
 
 ![diagram.png](docs/diagram.png)
 
-
 ### rfmpi2mqtt.py – the bridge between serial IO of rfmpi and MQTT.
 
 **RX:** Node data received is decoded according to config file and posted to rx MQTT topic & redis db
@@ -90,7 +89,17 @@ This software is designed for running on a raspberrypi with an rfmpi adapter boa
 2. Download the **open_thermostat_scheduler** folder to the user directory (/home/pi on the raspberry pi)
 3. Copy the files heating.html, jquery-1.9.0.min.js and folder open\_thermostat_scheduler/web/api to /var/www
 4. Upload the RFM12Pi\_hardcoded_simple firmware to your RFMPi adapter board set your radio settings. You can do compile and upload the code using a tool called inotool. see [readme in inotool folder](https://github.com/emoncms/development/tree/master/experimental/control/open_thermostat_scheduler/inotool)
-5. 
+5. Run rfmpi2mqtt.py:
+
+    python rfmpi2mqtt.py
+
+6. Run runschedule.py:
+
+    python runschedule.py
+
+7. Open the heating controller interface:
+
+    http://localhost/heating.html
 
 Can be used with emoncms mqttdev branch:
 https://github.com/emoncms/emoncms/tree/mqttdev
