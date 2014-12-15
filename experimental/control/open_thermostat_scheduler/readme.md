@@ -106,3 +106,5 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 - Add logging to runschedule.py
 - Authentication on integration with emoncms loging authentication for HTTP Api and heating.html page
 - Watchdog for service scripts
+- Extend heating.html to allow multi-zone control
+- Develop android app version of heating.html
