@@ -2,6 +2,8 @@
 
 This is work in progress - it has not yet reached a working first release state
 
+![topgraphic.png](docs/topgraphic.png)
+
 ## Development Notes:
 
 ![diagram.png](docs/diagram.png)
