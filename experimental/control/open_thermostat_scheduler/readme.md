@@ -75,6 +75,27 @@ provides a HTTP interface too:
 - rfmpi tx: used to send data out to the nodes (heating state variables/comands)
 - application state data (user schedule)
 
+**Testing the API**
+
+The API used both the GET and POST HTTP methods, run these commands in terminal to test:
+
+GET:
+
+    GET http://localhost/api/rx/room/temperature
+    GET http://localhost/api/app/heating/mode
+    GET http://localhost/api/app/heating/state
+    GET http://localhost/api/app/heating/schedule
+    
+POST:
+    
+    curl --data 16.5 http://localhost/api/rx/room/temperature
+    curl --data 1 http://localhost/api/app/heating/mode
+    
+To send a command to the rfmpi adapter board, ie to set heating on and set point to 21C:
+
+    curl --data 1,2100 http://localhost/api/tx/heating
+    
+
 ###  Design idea: Using MQTT + Redis for responsive control
 
 One of the main design ideas used here is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
