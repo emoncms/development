@@ -54,7 +54,7 @@ def on_readline(line):
             print "  rx/"+nodename+"/"+varname+" "+str(decoded[i])
             mqttc.publish("rx/"+nodename+"/"+varname,decoded[i])
             
-            r.set("node:%s:%s" % (nodename, varname),decoded[i])
+            r.set("rx/%s/%s" % (nodename, varname),decoded[i])
         
 
 # Start MQTT (Mosquitto)

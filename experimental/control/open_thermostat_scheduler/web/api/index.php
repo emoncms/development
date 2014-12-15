@@ -23,8 +23,8 @@
     $method = $_SERVER['REQUEST_METHOD'];
 
     $keys = array(
-        "node/room/temperature"=>array("type"=>"float"),
-        "node/room/battery"=>array("type"=>"int"),
+        "rx/room/temperature"=>array("type"=>"float"),
+        "rx/room/battery"=>array("type"=>"int"),
         
         "tx/heating"=>array("type"=>"csv"),
         

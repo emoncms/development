@@ -297,7 +297,7 @@ function updateclock()
 
 function update()
 {
-    room_temperature = server_get("node/room/temperature");
+    room_temperature = server_get("rx/room/temperature");
     
     $(".zone-temperature").html(room_temperature.toFixed(1)+"&deg;C");
 }

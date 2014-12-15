@@ -91,3 +91,8 @@ you need control over exactly what is persisted to disk
 
 changes of state are pushed to mqtt topics
 state is persisted in redis
+
+
+# Install
+
+
