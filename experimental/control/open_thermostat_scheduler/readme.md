@@ -8,7 +8,9 @@ This software is work in progress and while the inital release has been tested t
 
 ![diagram.png](docs/diagram.png)
 
-### rfmpi2mqtt.py – the bridge between serial IO of rfmpi and MQTT.
+### rfmpi2mqtt.py
+
+bridge between serial IO of rfmpi and MQTT.
 
 **RX:** Node data received is decoded according to config file and posted to rx MQTT topic & redis db
 
