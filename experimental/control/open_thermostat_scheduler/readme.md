@@ -4,6 +4,8 @@ This is work in progress - it has not yet reached a working first release state
 
 ## Development Notes:
 
+![diagram.png](docs/diagram.png)
+
 
 **rfmpi2mqtt.py** – the bridge between serial IO of rfmpi and MQTT.
 
