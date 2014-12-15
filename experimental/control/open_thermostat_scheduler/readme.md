@@ -182,7 +182,7 @@ The code to do this gets complex fast resulting in much harder to read and under
 - [archive/attempt01_verymanual.php](https://github.com/emoncms/development/blob/master/experimental/control/open_thermostat_scheduler/archive/attempt01_verymanual.php)
 - [archive/attempt03_extended_api.php](https://github.com/emoncms/development/blob/master/experimental/control/open_thermostat_scheduler/archive/attempt03_extended_api.php)
 
-It would be great however to achieve this fuller API if a more elgant solution could be found. 
+It would be great however to achieve this fuller API if a more elgant solution could be found. (attempt02 was my chosen solution in the end see: [api/index.php](https://github.com/emoncms/development/blob/master/experimental/control/open_thermostat_scheduler/web/api/index.php))
 
 
 ### Remote emoncms dispatchers
