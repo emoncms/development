@@ -170,12 +170,12 @@ In the implementation above the scheduler interface can send manual heating comm
 
 While developing the server side component that provides a HTTP interface for heating.html to access data in MQTT and Redis I tried a couple of different ideas. My ideal API I think would provide several options so that in addition to being able to fetch a single variable by its key:
 
-GET http://localhost/api/rx/room/temperature
+    GET http://localhost/api/rx/room/temperature
 
 It would also be possible to request the entire node or even all the nodes by going along the hierarchy. 
 
-GET http://localhost/api/rx/room -> {"temperature":18.5, "battery":3.3}
-GET http://localhost/api/rx      -> {"room":{"temperature":18.5, "battery":3.3}}
+    GET http://localhost/api/rx/room -> {"temperature":18.5, "battery":3.3}
+    GET http://localhost/api/rx      -> {"room":{"temperature":18.5, "battery":3.3}}
 
 The code to do this gets complex fast resulting in much harder to read and understand code, so in the end I decided to revert to the simple full key approach. It would be great however to achieve this fuller API if a more elgant solution could be found
 
