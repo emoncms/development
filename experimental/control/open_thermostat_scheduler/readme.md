@@ -94,6 +94,7 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 - Extend heating.html to allow multi-zone control
 - Develop android app version of heating.html
 - Investigate replacing rfmpi2mqtt.py with emonhub once emonhub can carry out same functionality
+- Investigate using nodejs with websockets as developed here [https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat](https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat) to allow pushing of updates to the client
 
 # Development questions
 
