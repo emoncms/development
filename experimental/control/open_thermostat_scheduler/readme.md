@@ -58,7 +58,7 @@ Bridge between serial IO of rfmpi and MQTT based on emonhub.
 
 The scheduler interface provides a UI that generates a schedule object detailing the heating schedule for every day of the week. The heating schedule can be overridden with a manual setpoint and heating state in manual mode. The variables required for this application are:
     
-    	js object:			value				redis/mqtt topic key
+	js object:			value				redis/mqtt topic key
 	heating.state			1/0				app/heating/state
 	heating.manualsetpoint		<temperature>			app/heating/manualsetpoint
 	heating.mode			manual/schedule			app/heating/mode
