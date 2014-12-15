@@ -74,7 +74,7 @@ provides a HTTP interface too:
 - rfmpi tx: used to send data out to the nodes (heating state variables/comands)
 - application state data (user schedule)
 
-###  Design idea: MQTT & Redis
+###  Design idea: Using MQTT + Redis for responsive control
 
 One of the main design ideas used here is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
 
