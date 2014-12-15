@@ -10,7 +10,7 @@ This software is work in progress and while the inital release has been tested t
 
 ### rfmpi2mqtt.py
 
-bridge between serial IO of rfmpi and MQTT.
+Bridge between serial IO of rfmpi and MQTT based on emonhub.
 
 **RX:** Node data received is decoded according to config file and posted to rx MQTT topic & redis db
 
