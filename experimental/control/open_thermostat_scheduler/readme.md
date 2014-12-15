@@ -72,15 +72,6 @@ The main design idea is that any property which might be an: integer, float, jso
 
 
 
-## Command routing
-
-The scheduler interface could also send commands directly to rfmpi2mqtt.py script controlling heating system but then any changes of state also need to be transferred to the runschedule.py script before runschedule.py sends any commands to rfmpi2mqtt.py.
-This provides two possibilities either commands to rfmpi2mqtt are only sent my runshedule.py and so to get fast response runschedule.py needs to receive ui state change via mqtt rather than polling redis.
-
-In the event that runscheduler fails, it may be an advantage if the UI can send commands directly via sever:api to rfmpi2mqtt. That failure of runschedule.py only reduces functionality  rather than completely disabling heating control. 
-
-In both cases whether control is via runschedule.py or if commands can go both directly and via runschedule.py. If you want responsive control, state updates to the heating variables need to be passed to runscheduler via a push mechanism (such as mqtt pub/sub)
-
 ## Recording state and changes of state
 
 - program state (schedule object, manual heating settings)
@@ -108,8 +99,15 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 - Watchdog for service scripts
 - Extend heating.html to allow multi-zone control
 - Develop android app version of heating.html
+- Investigate replacing rfmpi2mqtt.py with emonhub once emonhub can carry out same functionality
 
 # Development questions
+
+### Command routing
+
+In the implementation above the scheduler interface can send manual heating commands directly to rfmpi2mqtt.py via api.php in addition to sending heating schedule settings changes to runschedule.py. In the event that runschedule.py crashes/fails this provides a failure mode that still allows manual control of the heating. The alternative is that all commands go via runschedule.py which then in turn sends commands to rfmpi2mqtt.py, is there an event where commands could be simultaneously sent by runsheduler.py and directly causing the program to get into a 'mixed' state?
+
+### Remote emoncms dispatchers
 
 In the implementation above node data is published to a MQTT topic key for each node/variable. This works ok for transfering data locally between scripts but if we wanted to dispatch node data to a remote emoncms account translating a mqtt variable update to a http request to emoncms.org for every single input would not be the most efficient way of sending data and would multiply the connection load on emoncms.org considerably. At the moment emonhub has a dispatcher that buffers node data which can in turn contain many node variables. It might be nice to hang dispatchers off the MQTT rx/node/variable bus but to then dispatch an efficient message would require recombination of the individual variables into nodes and would have associated challenges with defining which variable to trigger dispatching with. Perhaps another MQTT topic is required which holds this node data without it having being split into sperate variables.
 
