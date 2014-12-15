@@ -7,7 +7,7 @@ This is work in progress - it has not yet reached a working first release state
 ![diagram.png](docs/diagram.png)
 
 
-**rfmpi2mqtt.py** – the bridge between serial IO of rfmpi and MQTT.
+### rfmpi2mqtt.py – the bridge between serial IO of rfmpi and MQTT.
 
 **RX:** Node data received is decoded according to config file and posted to rx MQTT topic & redis db
 
@@ -51,7 +51,9 @@ This is work in progress - it has not yet reached a working first release state
     30,1,18,7,s
 
 
-**heating.html** - The scheduler interface provides a UI that generates a schedule object detailing the heating schedule for every day of the week. The heating schedule can be overridden with a manual setpoint and heating state in manual mode. The variables required for this application are:
+### heating.html 
+
+The scheduler interface provides a UI that generates a schedule object detailing the heating schedule for every day of the week. The heating schedule can be overridden with a manual setpoint and heating state in manual mode. The variables required for this application are:
     
 	heating_state			    on/off
 	heating_manual_setpoint		<temperature>		
@@ -60,15 +62,21 @@ This is work in progress - it has not yet reached a working first release state
 
 These variables need to be persisted in the server database – (ideally persisted to disk, at the moment the app is using redis which can be configured to persist but its not ideal as you don’t want to persist the regularly updated node data – to reduce disk writes)
 
-**runschedule.py** - The scheduler interface needs to be used in conjunction with an always running script that runs the schedule when the web page interface is not loaded by the user. The scheduler UI needs to pass the above configuration variables to the runschedule.py script.
+### runschedule.py 
 
-**api/index.php** - provides a HTTP interface too:
+The scheduler interface needs to be used in conjunction with an always running script that runs the schedule when the web page interface is not loaded by the user. The scheduler UI needs to pass the above configuration variables to the runschedule.py script.
+
+### api/index.php
+
+provides a HTTP interface too:
 
 - rfmpi rx: node data received from wireless nodes, ie: room/temperature
 - rfmpi tx: used to send data out to the nodes (heating state variables/comands)
 - application state data (user schedule)
 
-The main design idea is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
+###  Design idea: MQTT & Redis
+
+One of the main design ideas used here is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
 
 # Install
 
