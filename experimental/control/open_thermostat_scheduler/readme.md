@@ -85,24 +85,33 @@ This software is work in progress and while the inital release has been tested t
 
 This software is designed for running on a raspberrypi with an rfmpi adapter board connected. It can be run on any linux computer with a jeelink or equivalent serial to rfm12/69 interface board.
 
-1. Start by following low write SD card emoncms installation guide here: [https://github.com/emoncms/emoncms/tree/bufferedwrite](https://github.com/emoncms/emoncms/tree/bufferedwrite) this will install most of the requirements needed it can be installed from scratch or using the ready to go image.
-2. Download the **open_thermostat_scheduler** folder to the user directory (/home/pi on the raspberry pi)
-3. Copy the files heating.html, jquery-1.9.0.min.js and folder open\_thermostat_scheduler/web/api to /var/www
-4. Upload the RFM12Pi\_hardcoded_simple firmware to your RFMPi adapter board set your radio settings. You can do compile and upload the code using a tool called inotool. see [readme in inotool folder](https://github.com/emoncms/development/tree/master/experimental/control/open_thermostat_scheduler/inotool)
-5. Run rfmpi2mqtt.py:
+Start by following low write SD card emoncms installation guide here: [https://github.com/emoncms/emoncms/tree/bufferedwrite](https://github.com/emoncms/emoncms/tree/bufferedwrite) this will install most of the requirements needed it can be installed from scratch or using the ready to go image.
+
+Download the **open_thermostat_scheduler** folder to the user directory (/home/pi on the raspberry pi)
+
+Copy the files heating.html, jquery-1.9.0.min.js and folder open\_thermostat_scheduler/web/api to /var/www
+
+Upload the RFM12Pi\_hardcoded_simple firmware to your RFMPi adapter board set your radio settings. You can do compile and upload the code using a tool called inotool. see [readme in inotool folder](https://github.com/emoncms/development/tree/master/experimental/control/open_thermostat_scheduler/inotool)
+
+Run rfmpi2mqtt.py:
 
     python rfmpi2mqtt.py
 
-6. Run runschedule.py:
+Run runschedule.py:
 
     python runschedule.py
 
-7. Open the heating controller interface:
+Open the heating controller interface:
 
     http://localhost/heating.html
 
 Can be used with emoncms mqttdev branch:
 https://github.com/emoncms/emoncms/tree/mqttdev
+
+Run the phpmqtt\_input.php script in the scripts folder to subscribe to the mqtt node data. Set the userid in the phpmqtt\_input.php to your userid before running the script.
+
+cd /var/www/emoncms/scripts
+sudo phpmqtt_input.php
 
 # Todo
 
