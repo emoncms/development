@@ -177,8 +177,12 @@ It would also be possible to request the entire node or even all the nodes by go
     GET http://localhost/api/rx/room -> {"temperature":18.5, "battery":3.3}
     GET http://localhost/api/rx      -> {"room":{"temperature":18.5, "battery":3.3}}
 
-The code to do this gets complex fast resulting in much harder to read and understand code, so in the end I decided to revert to the simple full key approach. It would be great however to achieve this fuller API if a more elgant solution could be found
+The code to do this gets complex fast resulting in much harder to read and understand code, so in the end I decided to revert to the simple full key approach. see attempt03\_extended_api.php for my attempt:
 
+- [attempt01_verymanual.php](https://github.com/emoncms/development/blob/master/experimental/control/open_thermostat_scheduler/archive/attempt01_verymanual.php)
+- [archive/attempt03_extended_api.php](https://github.com/emoncms/development/blob/master/experimental/control/open_thermostat_scheduler/archive/attempt03_extended_api.php)
+
+It would be great however to achieve this fuller API if a more elgant solution could be found. 
 
 
 ### Remote emoncms dispatchers
