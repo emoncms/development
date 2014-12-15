@@ -111,7 +111,20 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 
 # Development questions
 
-In the implementation above node data is published to a MQTT topic key for each node/variable. This works ok for transfering data locally between scripts but if we wanted to dispatch node data to a remote emoncms account translating a mqtt variable update to a http request to emoncms.org for every single input would not be the most efficient way of sending data and would multiply the connection load on emoncms.org considerably. At the moment emonhub has a dispatcher that buffers node data which can in turn contain many node variables. It might be nice to hang dispatchers off the MQTT rx/node/variable bus but to then dispatch an efficient message would require recombination of the individual variables into nodes and would have associated challenges with defining which variable to trigger dispatching with. Perhaps another MQTT topic is required which holds this node data without it having being split into sperate variables:
+In the implementation above node data is published to a MQTT topic key for each node/variable. This works ok for transfering data locally between scripts but if we wanted to dispatch node data to a remote emoncms account translating a mqtt variable update to a http request to emoncms.org for every single input would not be the most efficient way of sending data and would multiply the connection load on emoncms.org considerably. At the moment emonhub has a dispatcher that buffers node data which can in turn contain many node variables. It might be nice to hang dispatchers off the MQTT rx/node/variable bus but to then dispatch an efficient message would require recombination of the individual variables into nodes and would have associated challenges with defining which variable to trigger dispatching with. Perhaps another MQTT topic is required which holds this node data without it having being split into sperate variables.
+
+The current format looks like this:
+
+    data=[
+        [0,18,18.5,3.3],
+        [5,18,18.5,3.3],
+        [10,18,18.5,3.3]
+    ]
+    &sentat=12
+    
+where [0,18,18.5,3.3] = [time,node,var1,var2]
+
+perhaps a less space efficient more verbose format could be sent, which would allow naming to be sent to the remote emoncms.org account:
 
     bulkdata = [
     	{"time":0, "node":"room", "var":{"temperature":18.5, "battery":3.3}}
