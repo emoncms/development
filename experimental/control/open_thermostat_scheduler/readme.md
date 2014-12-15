@@ -110,8 +110,8 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 
 Run the phpmqtt\_input.php script in the scripts folder to subscribe to the mqtt node data. Set the userid in the phpmqtt\_input.php to your userid before running the script.
 
-cd /var/www/emoncms/scripts
-sudo phpmqtt_input.php
+    cd /var/www/emoncms/scripts
+    sudo phpmqtt_input.php
 
 # Todo
 
