@@ -95,4 +95,14 @@ state is persisted in redis
 
 # Install
 
+Can be used with emoncms mqttdev branch:
+https://github.com/emoncms/emoncms/tree/mqttdev
 
+# Todo
+
+- Service script for rfmpi2mqtt.py
+- Service script for runschedule.py
+- Add logging to rfmpi2mqtt.py
+- Add logging to runschedule.py
+- Authentication on integration with emoncms loging authentication for HTTP Api and heating.html page
+- Watchdog for service scripts
