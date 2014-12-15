@@ -70,20 +70,6 @@ These variables need to be persisted in the server database – (ideally persist
 
 The main design idea is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
 
-
-
-## Recording state and changes of state
-
-- program state (schedule object, manual heating settings)
-- node rx state (node data, room temperature etc)
-- node tx state (command state)
-
-you need control over exactly what is persisted to disk
-
-changes of state are pushed to mqtt topics
-state is persisted in redis
-
-
 # Install
 
 Can be used with emoncms mqttdev branch:
@@ -102,6 +88,16 @@ https://github.com/emoncms/emoncms/tree/mqttdev
 - Investigate replacing rfmpi2mqtt.py with emonhub once emonhub can carry out same functionality
 
 # Development questions
+
+## Persistance
+
+At the moment all state is recorded in the redis database including:
+
+- program state (schedule object, manual heating settings)
+- node rx state (node data, room temperature etc)
+- node tx state (last sent command state to rfmpi)
+
+The redis database can be configured to persist to disk every x key update or to just run in ram. It would be beneficial to be able to select which keys must get persisted and which keys do not need to be persisted. Perhaps another storage engine is needed in addition to redis? another key value store and a setting in the program config to say which key:value's are stored in the disk based db and which in the ram db. The user heating schedule is an example of data that would be critical to persist. While last value node data does not need to be persisted as persisting would result in regular disk writes and on system reboot the nodes will updated new values within a short timeframe.
 
 ### Command routing
 
