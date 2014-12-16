@@ -4,6 +4,53 @@ This software is work in progress and while the inital release has been tested t
 
 ![topgraphic.png](docs/topgraphic.png)
 
+# Install
+
+This software is work in progress and while the inital release has been tested to be basically functional there are still lots of parts to it that are missing: authentication, service scripts, etc see todo list below.
+
+This software is designed for running on a raspberrypi with an rfmpi adapter board connected. It can be run on any linux computer with a jeelink or equivalent serial to rfm12/69 interface board.
+
+Start by following low write SD card emoncms installation guide here: [https://github.com/emoncms/emoncms/tree/bufferedwrite](https://github.com/emoncms/emoncms/tree/bufferedwrite) this will install most of the requirements needed it can be installed from scratch or using the ready to go image.
+
+Download the **open_thermostat_scheduler** folder to the user directory (/home/pi on the raspberry pi)
+
+Copy the files heating.html, jquery-1.9.0.min.js and folder open\_thermostat_scheduler/web/api to /var/www
+
+Upload the RFM12Pi\_hardcoded_simple firmware to your RFMPi adapter board set your radio settings. You can do compile and upload the code using a tool called inotool. see [readme in inotool folder](https://github.com/emoncms/development/tree/master/experimental/control/open_thermostat_scheduler/inotool)
+
+Run rfmpi2mqtt.py:
+
+    python rfmpi2mqtt.py
+
+Run runschedule.py:
+
+    python runschedule.py
+
+Open the heating controller interface:
+
+    http://localhost/heating.html
+
+Can be used with emoncms mqttdev branch:
+https://github.com/emoncms/emoncms/tree/mqttdev
+
+Run the phpmqtt\_input.php script in the scripts folder to subscribe to the mqtt node data. Set the userid in the phpmqtt\_input.php to your userid before running the script.
+
+    cd /var/www/emoncms/scripts
+    sudo phpmqtt_input.php
+
+# Todo
+
+- Service script for rfmpi2mqtt.py
+- Service script for runschedule.py
+- Add logging to rfmpi2mqtt.py
+- Add logging to runschedule.py
+- Authentication on integration with emoncms loging authentication for HTTP Api and heating.html page
+- Watchdog for service scripts
+- Extend heating.html to allow multi-zone control
+- Develop android app version of heating.html
+- Investigate replacing rfmpi2mqtt.py with emonhub once emonhub can carry out same functionality
+- Investigate using nodejs with websockets as developed here [https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat](https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat) to allow pushing of updates to the client
+
 ## Development Notes:
 
 ![diagram.png](docs/diagram.png)
@@ -102,53 +149,6 @@ To send a command to the rfmpi adapter board, ie to set heating on and set point
 ###  Design idea: Using MQTT + Redis for responsive control
 
 One of the main design ideas used here is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
-
-# Install
-
-This software is work in progress and while the inital release has been tested to be basically functional there are still lots of parts to it that are missing: authentication, service scripts, etc see todo list below.
-
-This software is designed for running on a raspberrypi with an rfmpi adapter board connected. It can be run on any linux computer with a jeelink or equivalent serial to rfm12/69 interface board.
-
-Start by following low write SD card emoncms installation guide here: [https://github.com/emoncms/emoncms/tree/bufferedwrite](https://github.com/emoncms/emoncms/tree/bufferedwrite) this will install most of the requirements needed it can be installed from scratch or using the ready to go image.
-
-Download the **open_thermostat_scheduler** folder to the user directory (/home/pi on the raspberry pi)
-
-Copy the files heating.html, jquery-1.9.0.min.js and folder open\_thermostat_scheduler/web/api to /var/www
-
-Upload the RFM12Pi\_hardcoded_simple firmware to your RFMPi adapter board set your radio settings. You can do compile and upload the code using a tool called inotool. see [readme in inotool folder](https://github.com/emoncms/development/tree/master/experimental/control/open_thermostat_scheduler/inotool)
-
-Run rfmpi2mqtt.py:
-
-    python rfmpi2mqtt.py
-
-Run runschedule.py:
-
-    python runschedule.py
-
-Open the heating controller interface:
-
-    http://localhost/heating.html
-
-Can be used with emoncms mqttdev branch:
-https://github.com/emoncms/emoncms/tree/mqttdev
-
-Run the phpmqtt\_input.php script in the scripts folder to subscribe to the mqtt node data. Set the userid in the phpmqtt\_input.php to your userid before running the script.
-
-    cd /var/www/emoncms/scripts
-    sudo phpmqtt_input.php
-
-# Todo
-
-- Service script for rfmpi2mqtt.py
-- Service script for runschedule.py
-- Add logging to rfmpi2mqtt.py
-- Add logging to runschedule.py
-- Authentication on integration with emoncms loging authentication for HTTP Api and heating.html page
-- Watchdog for service scripts
-- Extend heating.html to allow multi-zone control
-- Develop android app version of heating.html
-- Investigate replacing rfmpi2mqtt.py with emonhub once emonhub can carry out same functionality
-- Investigate using nodejs with websockets as developed here [https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat](https://github.com/emoncms/development/tree/master/experimental/control/nodejs_websocket_thermostat) to allow pushing of updates to the client
 
 # Development questions
 
