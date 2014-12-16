@@ -1,5 +1,10 @@
 # Open heating controller/thermostat scheduler software development v0.1
 
+Energy use for space heating in buildings accounts for 19.5% of total primary energy or 28.6% 
+of end use energy in the UK. The ZeroCarbonBritain report by the Center for Alternative Technology suggests that a space heating energy saving of 50-60% is achievable across all buildings. 40% from better insulation,a further 10% from better air-tightness and another 10% from better heating controls. See [OpenEnergyMonitor Sustainable Energy](http://openenergymonitor.org/emon/sustainable-energy)
+
+The aim of the open thermostat scheduler is to explore how we can improve on heating controls to achieve space heating energy savings.
+
 This software is work in progress and while the inital release has been tested to be basically functional there are still lots of parts to it that are missing: authentication, service scripts, etc see todo list below.
 
 ![topgraphic.png](docs/topgraphic.png)
@@ -146,7 +151,7 @@ To send a command to the rfmpi adapter board, ie to set heating on and set point
     curl --data 1,2100 http://localhost/api/tx/heating
     
 
-###  Design idea: Using MQTT + Redis for responsive control
+###  Using MQTT + Redis for responsive control
 
 One of the main design ideas used here is that any property which might be an: integer, float, json, csv is stored in a server side key:value database (i.e redis in this case) and is also passed to MQTT. The HTTP api url mirror's the database and MQTT key for that variable. When a property is updated it is **both** saved to the redis database and published to a MQTT topic of the same key name. Publishing to MQTT rather than having other scripts poll redis on a ususally slower basis makes it possible for the control application to be very responseive to user input, turning on a light via a relay as soon as a web html button in the browser is pressed.
 
