@@ -3,7 +3,9 @@
 Energy use for space heating in buildings accounts for 19.5% of total primary energy or 28.6% 
 of end use energy in the UK. The ZeroCarbonBritain report by the Center for Alternative Technology suggests that a space heating energy saving of 50-60% is achievable across all buildings. 40% from better insulation,a further 10% from better air-tightness and another 10% from better heating controls. See [OpenEnergyMonitor Sustainable Energy](http://openenergymonitor.org/emon/sustainable-energy)
 
-The aim of the open thermostat scheduler is to explore how we can improve on heating controls to achieve space heating energy savings.
+The aim of the open thermostat scheduler is to explore how we can improve on heating controls to achieve space heating energy savings. If existing heating controls either over-heat rooms/zones or heat rooms/zones when they not in use energy savings are made by matching the heating of any room or zone as closely as possible to the use of that room/zone. The aim is to lower the average internal temperature as much as possible while still achieving comfortable temperatures for the period the rooms are occupied. There is a general rule that for every 1C the thermostat is turned down you can make a 10% heating energy saving. Savings are likely to be larger in buildings that are poorly insulated and have less thermal mass. 
+
+In buildings which are already under heated with heating being turned on by the user manually for short periods, a scheduler may not result in energy savings and there is a possibility that the added convenience of being able to turn on heating remotely may result in larger energy use as the building may be heated for longer periods.
 
 This software is work in progress and while the inital release has been tested to be basically functional there are still lots of parts to it that are missing: authentication, service scripts, etc see todo list below.
 
