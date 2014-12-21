@@ -61,7 +61,7 @@ def test_disconnect():
 mqttc = mosquitto.Mosquitto()
 mqttc.on_message = on_message
 mqttc.connect("127.0.0.1",1883, 60, True)
-mqttc.subscribe("rx/#", 0)
+mqttc.subscribe("log", 0)
 
 if thread is None:
     thread = Thread(target=background_thread)
