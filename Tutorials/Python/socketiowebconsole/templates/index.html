@@ -27,7 +27,29 @@
             });
             
             // socket.emit('my event', {data: $('#emit_data').val()});
+            
+            $.ajax({ url: "conf", cache: false, success: function(data){
+                $("#emonhubconf").val(data);
+            }});
+            
+            $("#saveconf").click(function(){
+                $.ajax({ type:'POST', url: "conf", contentType: "text/plain", data: $("#emonhubconf").val() });
+            });
+            
+            $("#start-emonhub").click(function(){
+                $.ajax({ type:'POST', url: "emonhub/start"});
+            });
+            
+            $("#stop-emonhub").click(function(){
+                $.ajax({ type:'POST', url: "emonhub/stop"});
+            });
+            
+            $("#restart-emonhub").click(function(){
+                $.ajax({ type:'POST', url: "emonhub/restart"});
+            });
+            
         });
+        
     </script>
     
     <style>
@@ -40,10 +62,21 @@
             overflow: scroll;
             overflow-x: hidden;
         }
+        
+        textarea {
+            padding:20px;
+            font-size:14px;
+        }
     </style>
     
 </head>
 <body>
     <pre id="log"></pre>
+    <button id="saveconf">Save conf</button>
+    <button id="start-emonhub">Start emonhub</button>
+    <button id="stop-emonhub">Stop emonhub</button>
+    <button id="restart-emonhub">Restart emonhub</button>
+    <textarea id="emonhubconf" style="width:100%; height:500px"></textarea>
 </body>
 </html>
+
