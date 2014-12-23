@@ -6,7 +6,7 @@ Username: demo, password: demo
 
 Being able to view the emonhub log from a browser rather than having to login via SSH could make debugging more convenient.
 
-![pythonwebconsole.png](docs/pywebconsole.png)
+![pythonwebconsole.png](docs/emonhubweb.png)
 
 # Install
 
