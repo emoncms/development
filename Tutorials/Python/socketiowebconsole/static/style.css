@@ -1,0 +1,123 @@
+html {
+    height:100%;
+    font-family: 'Ubuntu Light', sans-serif;
+    font-size: 18px;
+}
+
+body {
+    color:#333;
+    background-color:#fff;
+    padding:0px;
+    margin:0px;
+    height:100%;
+}
+
+.block {
+    padding:30px;
+}
+
+h1 { 
+    color: #ff2712;
+}
+
+h3 { 
+    color: #ff2712;
+    margin:0px;
+}
+
+hr {
+    background: #ff2712;
+    border: 0; height: 1px;
+}
+
+a {
+    text-decoration: none;
+    color:#000;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #ff2712;
+}
+
+#left-pane {
+    position: fixed;
+    width:160px;
+    top:0px;
+    left:0px;
+    height:100%;
+    background-color:#eee;
+    /*border: 1px solid rgba(255,0,0,0.2);*/
+}
+
+#right-pane {
+    margin-left:160px;
+    height:100%;
+    background-color:#fff;
+}
+
+.menu-item {
+    padding-bottom:10px;
+}
+
+.menu-item-heading {
+    padding-top:20px;
+    padding-bottom:5px;
+    font-size:14px;
+    font-weight:bold;
+    color:#555;
+}
+
+.console-out {
+    padding:20px;
+}
+
+pre {
+    /* 
+    Absolute method:
+    */
+    
+    position:absolute;
+    top:120px;
+    left:190px;
+    bottom:30px;
+    right:30px;
+    
+    /*
+    Fixed height method:
+    
+    width:100%;
+    height:600px;
+    */
+    
+    margin:0px;
+    padding:0px;
+    font-size:16px;
+    color:#fff;
+    background-color:#300a24;
+    overflow: scroll;
+    overflow-x: hidden;
+    
+}
+
+.bound-config {
+    width:100%;
+    margin:0px;
+    padding:0px;
+}
+
+textarea {
+    width:100%;
+    margin:0px;
+    padding:20px;
+    height:1400px;
+    font-size: 14px;
+    
+}
+
+.boxsizingborder {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+

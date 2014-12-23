@@ -1,82 +1,124 @@
-<!DOCTYPE HTML>
+<!doctype html>
+    
 <html>
-<head>
-    <title>Emonhub log</title>
-    
-    <script type="text/javascript" src="static/jquery-1.9.0.min.js"></script>
-    <script type="text/javascript" src="static/socket.io.min.js"></script>
-    
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            namespace = '/test'; // change to an empty string to use the global namespace
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Emoncms</title>
+        
+        <link href="static/style.css" rel="stylesheet">
+        
+        <script type="text/javascript" src="static/jquery-1.9.0.min.js"></script>
+        <script type="text/javascript" src="static/socket.io.min.js"></script>
+    </head>
 
-            // the socket.io documentation recommends sending an explicit package upon connection
-            // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
-            socket.on('connect', function() {
-                socket.emit('my event', {data: 'I\'m connected!'});
-            });
+    <body>
+    
+        <div id="left-pane">
+            <div class="block">
+                <h3>EmonHub</h3>
+                <br>
+                <div class="menu">
+                    <div class="menu-item"><a href="#nodes">Nodes</a></div>
+                    <div class="menu-item"><a href="#console">Console</a></div>
+                    <div class="menu-item"><a href="#config">Config</a></div>
+                </div>
+            </div>
+        </div>
 
-            // event handler for server sent data
-            // the data is displayed in the "Received" section of the page
-            socket.on('my response', function(msg) {
-                $('#log').append(msg.topic+" "+msg.payload+"\n");
-                var h = parseInt($('#log')[0].scrollHeight);
-                $('#log').scrollTop(h);
-                
-            });
-            
-            // socket.emit('my event', {data: $('#emit_data').val()});
-            
-            $.ajax({ url: "conf", cache: false, success: function(data){
-                $("#emonhubconf").val(data);
-            }});
-            
-            $("#saveconf").click(function(){
-                $.ajax({ type:'POST', url: "conf", contentType: "text/plain", data: $("#emonhubconf").val() });
-            });
-            
-            $("#start-emonhub").click(function(){
-                $.ajax({ type:'POST', url: "emonhub/start"});
-            });
-            
-            $("#stop-emonhub").click(function(){
-                $.ajax({ type:'POST', url: "emonhub/stop"});
-            });
-            
-            $("#restart-emonhub").click(function(){
-                $.ajax({ type:'POST', url: "emonhub/restart"});
-            });
+
+        <div id="right-pane">
+                <div class="block">
+                    <div id="view-console">
+                        <h3>Console</h3>
+                        <br>
+                        <button id="start-emonhub">Start emonhub</button>
+                        <button id="stop-emonhub">Stop emonhub</button>
+                        <button id="restart-emonhub">Restart emonhub</button>   
+                        <br>
+                        <pre id="log"><div  class="console-out"></div></pre>
+                    </div>
+                    
+                    <div id="view-config" style="display:none">
+                        <h3>Config</h3>
+                        <br>
+                        <button id="saveconf">Save changes</button><br><br>
+                        <div class="bound-config">
+                             <textarea id="emonhubconf" class="boxsizingborder"></textarea>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        
+    </body>
+
+</html>
+
+<script type="text/javascript" charset="utf-8">
+
+    var view = "console";
+    
+    $(document).ready(function(){
+        view = (window.location.hash).substring(1);
+        show_view();
+        
+        namespace = '/test'; // change to an empty string to use the global namespace
+
+        // the socket.io documentation recommends sending an explicit package upon connection
+        // this is specially important when using the global namespace
+        var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+
+        // event handler for server sent data
+        // the data is displayed in the "Received" section of the page
+        socket.on('my response', function(msg) {
+            $('.console-out').append(msg.topic+" "+msg.payload+"\n");
+            var h = parseInt($('#log')[0].scrollHeight);
+            $('#log').scrollTop(h);
             
         });
         
-    </script>
+        // socket.emit('my event', {data: $('#emit_data').val()});
+        
+        $.ajax({ url: "conf", cache: false, success: function(data){
+            $("#emonhubconf").val(data);
+        }});
+        
+        $("#saveconf").click(function(){
+            $.ajax({ type:'POST', url: "conf", contentType: "text/plain", data: $("#emonhubconf").val() });
+        });
+        
+        $("#start-emonhub").click(function(){
+            $.ajax({ type:'POST', url: "emonhub/start"});
+        });
+        
+        $("#stop-emonhub").click(function(){
+            $.ajax({ type:'POST', url: "emonhub/start"});
+        });
+        
+        $("#restart-emonhub").click(function(){
+            $.ajax({ type:'POST', url: "emonhub/restart"});
+        });
+        
+        $(window).on('hashchange', function() {
+            view = (window.location.hash).substring(1);
+            show_view();
+        });
+        
+    });
     
-    <style>
-        pre {
-            font-size:16px;
-            color:#fff;
-            background-color:#300a24;
-            padding:20px;
-            height:500px;
-            overflow: scroll;
-            overflow-x: hidden;
+    function show_view(){
+        if (view=="console") {
+            $("#view-config").hide();
+            $("#view-console").show();
         }
         
-        textarea {
-            padding:20px;
-            font-size:14px;
+        if (view=="config"){
+            $("#view-console").hide();
+            $("#view-config").show();
         }
-    </style>
-    
-</head>
-<body>
-    <pre id="log"></pre>
-    <button id="saveconf">Save conf</button>
-    <button id="start-emonhub">Start emonhub</button>
-    <button id="stop-emonhub">Stop emonhub</button>
-    <button id="restart-emonhub">Restart emonhub</button>
-    <textarea id="emonhubconf" style="width:100%; height:500px"></textarea>
-</body>
-</html>
-
+    }
+        
+</script>

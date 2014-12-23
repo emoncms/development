@@ -121,5 +121,5 @@ if __name__ == '__main__':
     mqtt_thread = MQTT_Thread()
     mqtt_thread.start()
     
-    socketio.run(app,host='0.0.0.0',port=80)
+    socketio.run(app,host='0.0.0.0',port=8000)
 
