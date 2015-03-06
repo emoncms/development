@@ -30,7 +30,7 @@
         
         "app/heating/state"=>array("type"=>"bool"),
         "app/heating/mode"=>array("type"=>"text","options"=>array("manual","schedule")),
-        "app/heating/setpoint"=>array("type"=>"float"),
+        "app/heating/manualsetpoint"=>array("type"=>"float"),
         "app/heating/schedule"=>array("type"=>"json")
     );
     
