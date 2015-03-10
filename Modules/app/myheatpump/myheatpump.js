@@ -1,13 +1,11 @@
-var app_heatpump = {
+var app_myheatpump = {
 
-    config: {
-        kwh: false,
-        power: false,
-        flow: false,
-        return: false,
-        ambient: false,
-        room: false
-    },
+    kwh: false,
+    power: false,
+    flow: false,
+    return: false,
+    ambient: false,
+    room: false,
     
     maxpower: 6000,
     speed: 0,
@@ -19,32 +17,62 @@ var app_heatpump = {
     
     // Include required javascript libraries
     include: [
-        "static/flot/jquery.flot.min.js",
-        "static/flot/jquery.flot.time.min.js",
-        "static/flot/jquery.flot.selection.min.js",
-        "static/vis.helper.js",
-        "static/flot/date.format.js",
-        "static/roundedrect.js"
+        "Lib/flot/jquery.flot.min.js",
+        "Lib/flot/jquery.flot.time.min.js",
+        "Lib/flot/jquery.flot.selection.min.js",
+        "Modules/app/vis.helper.js",
+        "Lib/flot/date.format.js",
+        "Modules/app/roundedrect.js"
     ],
 
     init: function()
     {
         $("body").css("background-color","#222");
+        
+        // Auto scan by feed names
+        var feeds = app_myheatpump.getfeedsbyid();
+        for (z in feeds)
+        {
+            var name = feeds[z].name.toLowerCase();
+            
+            if (name.indexOf("heatpump_power")!=-1) app_myheatpump.power = z;  
+            if (name.indexOf("heatpump_flow_temp")!=-1) app_myheatpump.flow = z;
+            if (name.indexOf("heatpump_return_temp")!=-1) app_myheatpump.return = z;
+            if (name.indexOf("heatpump_room_temp")!=-1) app_myheatpump.room = z;
+            if (name.indexOf("ambient_temp")!=-1) app_myheatpump.ambient = z;
+            if (name.indexOf("heatpump_kwh")!=-1) app_myheatpump.kwh = z;
+        }
 
+        this.feedupdate();
+        this.feedupdater = setInterval(this.feedupdate,5000);
+        this.updater = setInterval(this.update,this.dtime);
+
+        $("#myheatpump_zoomout").click(function () {view.zoomout(); app_myheatpump.draw();});
+        $("#myheatpump_zoomin").click(function () {view.zoomin(); app_myheatpump.draw();});
+        $('#myheatpump_right').click(function () {view.panright(); app_myheatpump.draw();});
+        $('#myheatpump_left').click(function () {view.panleft(); app_myheatpump.draw();});
+        $('.myheatpump_time').click(function () {view.timewindow($(this).attr("time")); app_myheatpump.draw();});
+
+        $('#myheatpump_placeholder').bind("plotselected", function (event, ranges)
+        {
+            view.start = ranges.xaxis.from;
+            view.end = ranges.xaxis.to;
+            app_myheatpump.draw();
+        });
+    },
+    
+    show: function()
+    {
         var canvas = document.getElementById("heatpump-diagram");
         var ctx = canvas.getContext("2d");
         this.ctx = ctx;
         
         this.draw_heatpump_outline();
         
-        this.feedupdate();
-        this.feedupdater = setInterval(this.feedupdate,5000);
-        this.updater = setInterval(this.update,this.dtime);
-
         var top_offset = 0;
-        var placeholder_bound = $('#placeholder_bound');
-        var placeholder = $('#placeholder');
-
+        var placeholder_bound = $('#myheatpump_placeholder_bound');
+        var placeholder = $('#myheatpump_placeholder');
+        
         var width = placeholder_bound.width();
         var height = width * 0.38;
 
@@ -64,9 +92,9 @@ var app_heatpump = {
         var interval = 3600*24;
         view.start = (Math.round((start/1000.0)/interval) * interval)*1000;
 
-        if (this.config.kwh) {
+        if (this.kwh) {
             
-            var whdata = this.getdata(this.config.kwh,view.start,view.end,interval);
+            var whdata = this.getdata(this.kwh,view.start,view.end,interval);
             var kwhd = [];
             
             for (var day=1; day<whdata.length; day++) {
@@ -74,10 +102,10 @@ var app_heatpump = {
                 kwhd.push([whdata[day][0],kwh]);
             }
 
-            $('#placeholder_wh').width(width)
-            $.plot($('#placeholder_wh'), [{data:kwhd, color:"#0699fa"}], {bars:{show:true, barWidth:3600*1000*20}, xaxis:{mode:"time",timezone: "browser"}});
+            $('#myheatpump_placeholder_wh').width(width)
+            $.plot($('#myheatpump_placeholder_wh'), [{data:kwhd, color:"#0699fa"}], {bars:{show:true, barWidth:3600*1000*20}, xaxis:{mode:"time",timezone: "browser"}});
             
-            $("#kwhgraph").show();
+            $("#myheatpump_kwhgraph").show();
         }
         
         var series = [];
@@ -87,21 +115,7 @@ var app_heatpump = {
         var fill = false;
         var plotColour = 0;
 
-        this.draw();
-
-        $("#zoomout").click(function () {view.zoomout(); app_heatpump.draw();});
-        $("#zoomin").click(function () {view.zoomin(); app_heatpump.draw();});
-        $('#right').click(function () {view.panright(); app_heatpump.draw();});
-        $('#left').click(function () {view.panleft(); app_heatpump.draw();});
-        $('.time').click(function () {view.timewindow($(this).attr("time")); app_heatpump.draw();});
-
-        placeholder.bind("plotselected", function (event, ranges)
-        {
-            view.start = ranges.xaxis.from;
-            view.end = ranges.xaxis.to;
-            app_heatpump.draw();
-        });
-        
+        app_myheatpump.draw();
     },
     
     draw_heatpump_outline: function() {
@@ -134,9 +148,9 @@ var app_heatpump = {
         ctx.stroke();
     },
     
-    close: function() {
-        //console.log("Updater: "+app_heatpump.updater);
-        clearInterval(app_heatpump.updater);
+    hide: function() {
+        clearInterval(app_myheatpump.updater);
+        clearInterval(app_myheatpump.feedupdater);
         $("body").css("background-color","#fff");
     },
     
@@ -151,19 +165,19 @@ var app_heatpump = {
             
                 for (z in feeds)
                 {
-                    if (feeds[z].id==app_heatpump.config.power) {
+                    if (feeds[z].id==app_myheatpump.power) {
                         $(".heatpump-power").html((feeds[z].value*1).toFixed(0));
-                        app_heatpump.speed = (feeds[z].value*1 / app_heatpump.maxpower);
-                        if (feeds[z].value<50) app_heatpump.speed = 0;
+                        app_myheatpump.speed = (feeds[z].value*1 / app_myheatpump.maxpower);
+                        if (feeds[z].value<50) app_myheatpump.speed = 0;
                     }
                     
-                    if (feeds[z].id==app_heatpump.config.flow) 
+                    if (feeds[z].id==app_myheatpump.flow) 
                         $(".heatpump-flow").html((feeds[z].value*1).toFixed(1));
-                    if (feeds[z].id==app_heatpump.config.return) 
+                    if (feeds[z].id==app_myheatpump.return) 
                         $(".heatpump-return").html((feeds[z].value*1).toFixed(1));
-                    if (feeds[z].id==app_heatpump.config.ambient) 
+                    if (feeds[z].id==app_myheatpump.ambient) 
                         $(".heatpump-ambient").html((feeds[z].value*1).toFixed(1));
-                    if (feeds[z].id==app_heatpump.config.room) 
+                    if (feeds[z].id==app_myheatpump.room) 
                         $(".room-temperature").html((feeds[z].value*1).toFixed(1));
                 } 
             
@@ -173,14 +187,14 @@ var app_heatpump = {
     
     update: function()
     {
-        var ctx = app_heatpump.ctx;
+        var ctx = app_myheatpump.ctx;
         
         ctx.fillStyle="#222"
         ctx.beginPath();
         ctx.arc(250,250,115,0,2*Math.PI);
         ctx.fill();
 
-        a = app_heatpump.time*10*app_heatpump.speed;
+        a = app_myheatpump.time*10*app_myheatpump.speed;
         
         ctx.fillStyle="#0699fa";
         for (var i=0; i<4; i++){
@@ -195,9 +209,7 @@ var app_heatpump = {
         ctx.arc(250,250,15,0,2*Math.PI);
         ctx.stroke();
         
-        app_heatpump.time += (app_heatpump.dtime*0.001);
-        
-        console.log(".");
+        app_myheatpump.time += (app_myheatpump.dtime*0.001);
     },
     
     draw: function()
@@ -222,31 +234,46 @@ var app_heatpump = {
         interval = Math.round(((view.end - view.start)/npoints)/1000);
         
         series = [];
-        if (this.config.power) series.push({data:this.getdata(this.config.power,view.start,view.end,interval), color:"rgb(10,150,230)", yaxis:2, lines:{fill:true}, label: "Power"});
-        if (this.config.flow) series.push({data:this.getdata(this.config.flow,view.start,view.end,interval), color:"rgb(10,120,210)", label: "Flow"});
-        if (this.config.return) series.push({data:this.getdata(this.config.return,view.start,view.end,interval), color:"rgb(10,100,190)", label: "Return"});
-        if (this.config.ambient) series.push({data:this.getdata(this.config.ambient,view.start,view.end,interval), color:"rgb(10,80,170)", label: "Outside"});
-        if (this.config.room) series.push({data:this.getdata(this.config.room,view.start,view.end,interval), color:"rgb(10,60,150)", label: "Room"});
+        if (this.power) series.push({data:this.getdata(this.power,view.start,view.end,interval), color:"rgb(10,150,230)", yaxis:2, lines:{fill:true}, label: "Power"});
+        if (this.flow) series.push({data:this.getdata(this.flow,view.start,view.end,interval), color:"rgb(10,120,210)", label: "Flow"});
+        if (this.return) series.push({data:this.getdata(this.return,view.start,view.end,interval), color:"rgb(10,100,190)", label: "Return"});
+        if (this.ambient) series.push({data:this.getdata(this.ambient,view.start,view.end,interval), color:"rgb(10,80,170)", label: "Outside"});
+        if (this.room) series.push({data:this.getdata(this.room,view.start,view.end,interval), color:"rgb(10,60,150)", label: "Room"});
 
 
         options.xaxis.min = view.start;
         options.xaxis.max = view.end;
-        $.plot(placeholder, series, options);
+        $.plot($('#myheatpump_placeholder'), series, options);
         
         //$(".tickLabel").each(function(i) { $(this).css("color", "#0699fa"); });
+    },
+    
+    getfeedsbyid: function()
+    {
+        var feeds = {};
+        $.ajax({                                      
+            url: path+"feed/list.json",
+            dataType: 'json',
+            async: false,                      
+            success: function(data_in) { feeds = data_in; } 
+        });
+        
+        var byid = {};
+        for (z in feeds) byid[feeds[z].id] = feeds[z];
+        return byid;
     },
     
     getdata: function(id,start,end,interval)
     {
         var data = [];
         $.ajax({                                      
-            url: path+"feed/average.json",                         
-            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval,
+            url: path+"feed/data.json",                         
+            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=1&limitinterval=1",
             dataType: 'json',
             async: false,                      
             success: function(data_in) { data = data_in; } 
         });
         return data;
-    }    
+    } 
     
 }

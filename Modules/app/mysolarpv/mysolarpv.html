@@ -1,86 +1,45 @@
-<?php global $path; ?>
-
-<!--[if IE]><script language="javascript" type="text/javascript" src="<?php echo $path;?>Lib/flot/excanvas.min.js"></script><![endif]-->
-<script language="javascript" type="text/javascript" src="<?php echo $path;?>Lib/flot/jquery.flot.min.js"></script>
-<script language="javascript" type="text/javascript" src="<?php echo $path;?>Lib/flot/jquery.flot.time.min.js"></script>
-<script language="javascript" type="text/javascript" src="<?php echo $path; ?>Lib/flot/jquery.flot.selection.min.js"></script>
-
-<script language="javascript" type="text/javascript" src="<?php echo $path; ?>Modules/vis/visualisations/vis.helper.js"></script>
-<script language="javascript" type="text/javascript" src="<?php echo $path; ?>Lib/flot/date.format.js"></script>
-
-<script type="text/javascript" src="<?php echo $path; ?>Modules/app/mysolarpv.js"></script>
-
-<style>
-
-.page {
-    width: 1170px;
-    height: auto;
-    margin: 0px auto;
-    text-align: left;
-    
-    padding:20px;
-    margin-top:0px;
-}
-
-  .electric-title {
-    font-weight:bold; 
-    font-size:22px; 
-    color:#aaa; 
-    padding-top:20px
-  }
-  
-  .power-value {
-    font-weight:bold; 
-    font-size:100px; 
-    color:#0699fa; 
-    padding-top:45px;
-    padding-bottom:30px;
-  }
-  
-  .kwh-value {
-    font-weight:normal; 
-    font-size:22px; 
-    color:#0699fa; 
-    padding-top:15px;
-  }
-  
-  .midtext {
-    font-weight:normal; 
-    font-size:22px; 
-    color:#0699fa;
-    padding-top:15px;
-  }
-  
-  .visnavblock {
-    color:#0699fa;
-    font-size:18px;
-  }
-  
-  .visnav {
-
-  }
-  
-  .visnav:hover {
-    color:#0699fa;
-    cursor: pointer;
-  }
-  
-</style>
-
 <div class="page">
+
+    <div id="mysolarpv-config" style="display:none; ">
+        
+        <div class="electric-title">APP CONFIG</div><br>
+        
+        
+        <table class="table">
+        <tr>
+            <td style="border:0;">
+                <p><b>Electricity consumption</b> feed id</p>
+                <input id="mysolarpv-housepower" type="text" />
+            </td>
+            <td style="border:0;">
+                <p><b>Solar generation</b> feed id</p>
+                <input id="mysolarpv-solarpower" type="text" />
+            </td>
+        </table>
+        
+        <button id="mysolarpv-configsave" class="btn btn-primary">Save</button>
+    </div>
+    
 <div class="block">
+
+    <div style="height:20px; border-bottom:1px solid #333; padding:8px;">
+        <div style="float:right;">
+            <!--<span style="color:#fff; margin-right:10px" >Settings</span>-->
+            <i id="mysolarpv-openconfig" class="icon-wrench icon-white" style="cursor:pointer"></i>
+        </div>
+    </div>
 
     <table style="width:100%">
     <tr>
-        <td>
+        <td style="border:0;">
             <div class="electric-title">POWER NOW</div>
             <div class="power-value"><span id="usenow">0</span>W</div>
         </td>
-        <td style="text-align:left">
+        <td style="text-align:left; border:0;">
             <div class="electric-title">BALANCE</div>
             <div class="midtext"><span id="balance"></span></div>
         </td>
-        <td style="text-align:right">
+        <td style="text-align:right; border:0;">
             <div class="electric-title">SOLAR PV</div>
             <div class="power-value" style="color:#dccc1f"><span id="solarnow">0</span>W</div>
         </td>
@@ -139,25 +98,3 @@
 <p style="color:#888; text-align:center"><b>Configuration:</b> This dashboard automatically looks for feeds named or containing the words: solar_power, house_power. To use this dashboard add these names to the relevant feeds.</p>
 </div>
 </div>
-
-<script>
-    var path = "<?php echo $path; ?>";
-
-    var feeds = {};
-    $.ajax({                                      
-        url: path+"feed/list.json",
-        dataType: 'json',
-        async: false,                      
-        success: function(data_in) { feeds = data_in; } 
-    });
-    
-    for (z in feeds)
-    {
-       var name = feeds[z].name.toLowerCase();
-       if (name.indexOf("solar_power")!=-1) app_mysolarpv.config.solarpower = feeds[z].id;
-       if (name.indexOf("house_power")!=-1) app_mysolarpv.config.housepower = feeds[z].id;
-    }
-
-    app_mysolarpv.init();
-    app_mysolarpv.show();
-</script>

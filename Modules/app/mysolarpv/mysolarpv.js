@@ -1,19 +1,11 @@
 var app_mysolarpv = {
 
-    config: {
-        solarpower: false,
-        housepower: false
-    },
+    solarpower: false,
+    housepower: false,
     
     feedname: "",
     
     live: false,
-    
-    annual_ecar_miles: 10000,
-    ecar_miles_per_kwh: 4.0,
-    daily_traduse: 6,
-    annual_onsite_solar_gen: 1754,
-    capacity_factor: 0.30,
 
     windnow: 0,
     lastviewstart: 0,
@@ -26,20 +18,36 @@ var app_mysolarpv = {
 
     // Include required javascript libraries
     include: [
-        "static/flot/jquery.flot.min.js",
-        "static/flot/jquery.flot.time.min.js",
-        "static/flot/jquery.flot.selection.min.js",
-        "static/vis.helper.js",
-        "static/flot/date.format.js"
+        "Lib/flot/jquery.flot.min.js",
+        "Lib/flot/jquery.flot.time.min.js",
+        "Lib/flot/jquery.flot.selection.min.js",
+        "Modules/app/vis.helper.js",
+        "Lib/flot/date.format.js"
     ],
 
     // App start function
     init: function()
     {
-        this.annual_energy_req = (this.daily_traduse*365) + (this.annual_ecar_miles/this.ecar_miles_per_kwh);
-        this.annual_wind_gen = this.annual_energy_req - this.annual_onsite_solar_gen;
-        this.my_wind_cap = ((this.annual_wind_gen / 365) / 0.024) / this.capacity_factor;
-
+        if (app.config["mysolarpv"]!=undefined) {
+            this.solarpower = app.config["mysolarpv"].solarpower;
+            this.housepower = app.config["mysolarpv"].housepower;
+        } else {
+            // Auto scan by feed names
+            var feeds = app_mysolarpv.getfeedsbyid();
+            for (z in feeds)
+            {
+                var name = feeds[z].name.toLowerCase();
+                
+                if (name.indexOf("house_power")!=-1) {
+                    app_mysolarpv.housepower = z;
+                }
+                
+                if (name.indexOf("solar_power")!=-1) {
+                    app_mysolarpv.solarpower = z;
+                }
+            }
+        }
+        
         var timeWindow = (3600000*24.0*1);
         view.end = +new Date;
         view.start = view.end - timeWindow;
@@ -69,6 +77,33 @@ var app_mysolarpv = {
             view.start = ranges.xaxis.from;
             view.end = ranges.xaxis.to;
             app_mysolarpv.draw();
+        });
+
+        $("#mysolarpv-openconfig").click(function(){
+            $("#mysolarpv-solarpower").val(app_mysolarpv.solarpower);
+            $("#mysolarpv-housepower").val(app_mysolarpv.housepower);
+            $("#mysolarpv-config").show();
+        });
+        
+        $("#mysolarpv-configsave").click(function() {
+            $("#mysolarpv-config").hide();
+            app_mysolarpv.solarpower = parseInt($("#mysolarpv-solarpower").val());
+            app_mysolarpv.housepower = parseInt($("#mysolarpv-housepower").val());
+            
+            // Save config to db
+            var config = app.config;
+            if (config==false) config = {};
+            config["mysolarpv"] = {
+                "solarpower": app_mysolarpv.solarpower,
+                "housepower": app_mysolarpv.housepower
+            };
+            app.setconfig(config);
+            
+            var timeWindow = (3600000*24.0*1);
+            view.end = +new Date;
+            view.start = view.end - timeWindow;
+            app_mysolarpv.draw();
+            
         });
         
         /*
@@ -134,36 +169,18 @@ var app_mysolarpv = {
     
     hide: function() 
     {
-        clearInterval(this.windupdater)
+        clearInterval(this.live);
     },
     
     livefn: function()
     {
-        var solar_now = 0;
+        var feeds = app_mysolarpv.getfeedsbyid();
         var use_now = 0;
-        var feeds = {};
-        $.ajax({                                      
-            url: path+"feed/list.json",
-            dataType: 'json',
-            async: false,                      
-            success: function(data_in) { feeds = data_in; } 
-        });
-
-        for (z in feeds)
-        {
-            var name = feeds[z].name.toLowerCase();
-            
-            if (name.indexOf("solar_power")!=-1) {
-                solar_now = feeds[z].value;
-            }
-            
-            if (name.indexOf("house_power")!=-1) {
-                use_now = feeds[z].value;
-            }
-        }
+        if (feeds[app_mysolarpv.housepower]!=undefined) use_now = feeds[app_mysolarpv.housepower].value;
+        var solar_now = 0;
+        if (feeds[app_mysolarpv.solarpower]!=undefined) solar_now = feeds[app_mysolarpv.solarpower].value;
         
-        var totalgen = solar_now;
-        var balance = totalgen - use_now;
+        var balance = solar_now - use_now;
         
         if (balance>0) $("#balance").html("<span style='color:#2ed52e'>EXPORTING: <b>"+Math.round(Math.abs(balance))+"W</b></span>");
         if (balance==0) $("#balance").html("");
@@ -171,8 +188,6 @@ var app_mysolarpv = {
         
         $("#solarnow").html(solar_now);
         $("#usenow").html(use_now);
-        
-        $("#totalgen").html(Math.round(totalgen));
     },
     
     draw: function ()
@@ -198,77 +213,64 @@ var app_mysolarpv = {
             this.lastviewstart = view.start;
             this.lastviewend = view.end;
             
-            app_mysolarpv.solar_data = this.getdata(this.config.solarpower,view.start,view.end,interval);
-            app_mysolarpv.house_data = this.getdata(this.config.housepower,view.start,view.end,interval);
+            if (this.solarpower) app_mysolarpv.solar_data = this.getdata(this.solarpower,view.start,view.end,interval);
+            if (this.housepower) app_mysolarpv.house_data = this.getdata(this.housepower,view.start,view.end,interval);
         }
-        
-        var use = 0;
-        var gen = 0;
-        var wind = 0;
-        
-        var interval = (app_mysolarpv.house_data[1][0] - app_mysolarpv.house_data[0][0])/1000;
-        var t = 0;
         
         var use_data = [];
         var gen_data = [];
-        var mywind_data = [];
         var bal_data = [];
         var store_data = [];
         
+        if (app_mysolarpv.house_data.length!=0) {
+
+        var interval = (app_mysolarpv.house_data[1][0] - app_mysolarpv.house_data[0][0])/1000;
+        var t = 0;
+        
         var store = 0;
+        var use = 0;
         var mysolar = 0;
         
         var total_solar_kwh = 0;
-        var total_wind_kwh = 0;
         var total_use_kwh = 0;
         var total_use_direct_kwh = 0;
         
         for (z in app_mysolarpv.house_data) {
             if (app_mysolarpv.house_data[z]!=undefined && app_mysolarpv.house_data[z][1]!=null) use = app_mysolarpv.house_data[z][1];
             if (app_mysolarpv.solar_data[z]!=undefined && app_mysolarpv.solar_data[z][1]!=null) mysolar = app_mysolarpv.solar_data[z][1];
-            if (app_mysolarpv.wind_data[z]!=undefined && app_mysolarpv.wind_data[z][1]!=null) wind = app_mysolarpv.wind_data[z][1];
             
-            var prc_of_capacity = wind / 8000;
-            var mywind = app_mysolarpv.my_wind_cap * prc_of_capacity;
-            
-            gen = mysolar + mywind;
-            
-            var balance = gen - use;
+            var balance = mysolar - use;
             
             if (balance>=0) total_use_direct_kwh += (use*interval)/(1000*3600);
-            if (balance<0) total_use_direct_kwh += (gen*interval)/(1000*3600);
+            if (balance<0) total_use_direct_kwh += (mysolar*interval)/(1000*3600);
             
             var store_change = (balance * interval) / (1000*3600);
             store += store_change;
             
             total_solar_kwh += (mysolar*interval)/(1000*3600);
-            total_wind_kwh += (mywind*interval)/(1000*3600);
             total_use_kwh += (use*interval)/(1000*3600);
             
             var time = app_mysolarpv.house_data[z][0];
             use_data.push([time,use]);
-            gen_data.push([time,gen]);
+            gen_data.push([time,mysolar]);
             bal_data.push([time,balance]);
             store_data.push([time,store]);
-            mywind_data.push([time,mywind]);
             
             t += interval;
         }
         $("#total_solar_kwh").html(total_solar_kwh.toFixed(1));
-        $("#total_wind_kwh").html(total_wind_kwh.toFixed(1));
-        $("#total_gen_kwh").html((total_solar_kwh+total_wind_kwh).toFixed(1));
         
         $("#total_use_kwh").html((total_use_kwh).toFixed(1));
         $("#total_use_direct_kwh").html((total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*total_use_direct_kwh/total_use_kwh)+"%)");
         
         $("#total_use_via_store_kwh").html((total_use_kwh-total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*(1-(total_use_direct_kwh/total_use_kwh)))+"%)");
         
+        }
         options.xaxis.min = view.start;
         options.xaxis.max = view.end;
         
         var series = [
             {data:gen_data,color: "#dccc1f", lines:{lineWidth:0, fill:1.0}},
-            {data:mywind_data,color: "#2ed52e", lines:{lineWidth:0, fill:1.0}},
             {data:use_data,color: "#0699fa",lines:{lineWidth:0, fill:0.8}}
         ];
         
@@ -313,12 +315,27 @@ var app_mysolarpv = {
         */
     },
     
+    getfeedsbyid: function()
+    {
+        var feeds = {};
+        $.ajax({                                      
+            url: path+"feed/list.json",
+            dataType: 'json',
+            async: false,                      
+            success: function(data_in) { feeds = data_in; } 
+        });
+        
+        var byid = {};
+        for (z in feeds) byid[feeds[z].id] = feeds[z];
+        return byid;
+    },
+    
     getdata: function(id,start,end,interval)
     {
         var data = [];
         $.ajax({                                      
-            url: path+"feed/history.json",                         
-            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval,
+            url: path+"feed/data.json",                         
+            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      
             success: function(data_in) { data = data_in; } 

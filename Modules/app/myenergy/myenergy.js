@@ -1,20 +1,12 @@
 var app_myenergy = {
 
-    config: {
-        solarpower: false,
-        housepower: false
-    },
+    solarpower: false,
+    housepower: false,
     
     feedname: "",
     
     live: false,
     
-    annual_ecar_miles: 10000,
-    ecar_miles_per_kwh: 4.0,
-    daily_traduse: 6,
-    annual_onsite_solar_gen: 1754,
-    capacity_factor: 0.30,
-
     windnow: 0,
     lastviewstart: 0,
     lastviewend: 0,
@@ -22,21 +14,43 @@ var app_myenergy = {
     house_data: [],
     solar_data: [],
     wind_data: [],
+    
+    annual_wind_gen: 3300,
+    capacity_factor: 0.4,
 
     // Include required javascript libraries
     include: [
-        "static/flot/jquery.flot.min.js",
-        "static/flot/jquery.flot.time.min.js",
-        "static/flot/jquery.flot.selection.min.js",
-        "static/vis.helper.js",
-        "static/flot/date.format.js"
+        "Lib/flot/jquery.flot.min.js",
+        "Lib/flot/jquery.flot.time.min.js",
+        "Lib/flot/jquery.flot.selection.min.js",
+        "Modules/app/vis.helper.js",
+        "Lib/flot/date.format.js"
     ],
 
     // App start function
     init: function()
     {
-        this.annual_energy_req = (this.daily_traduse*365) + (this.annual_ecar_miles/this.ecar_miles_per_kwh);
-        this.annual_wind_gen = this.annual_energy_req - this.annual_onsite_solar_gen;
+        if (app.config["myenergy"]!=undefined) {
+            this.annual_wind_gen = 1*app.config["myenergy"].annualwindgen;
+            this.solarpower = app.config["myenergy"].solarpower;
+            this.housepower = app.config["myenergy"].housepower;
+        } else {
+            // Auto scan by feed names
+            var feeds = app_myenergy.getfeedsbyid();
+            for (z in feeds)
+            {
+                var name = feeds[z].name.toLowerCase();
+                
+                if (name.indexOf("house_power")!=-1) {
+                    app_myenergy.housepower = z;
+                }
+                
+                if (name.indexOf("solar_power")!=-1) {
+                    app_myenergy.solarpower = z;
+                }
+            }
+        }
+        
         this.my_wind_cap = ((this.annual_wind_gen / 365) / 0.024) / this.capacity_factor;
 
         var timeWindow = (3600000*24.0*1);
@@ -75,6 +89,39 @@ var app_myenergy = {
             $("#chargerate").html(Math.round(balance));
         });   
         */
+        
+        $("#myenergy-openconfig").click(function(){
+            $("#myenergy-solarpower").val(app_myenergy.solarpower);
+            $("#myenergy-housepower").val(app_myenergy.housepower);
+            $("#myenergy-annualwind").val(app_myenergy.annual_wind_gen);
+            $("#myenergy-windcap").html(Math.round(app_myenergy.my_wind_cap)+"W");
+            $("#myenergy-prc3mw").html((100*app_myenergy.my_wind_cap / 5000000).toFixed(3));
+            $("#myenergy-config").show();
+        });
+        
+        $("#myenergy-configsave").click(function() {
+            $("#myenergy-config").hide();
+            app_myenergy.annual_wind_gen = $("#myenergy-annualwind").val();
+            app_myenergy.solarpower = $("#myenergy-solarpower").val();
+            app_myenergy.housepower = $("#myenergy-housepower").val();
+            app_myenergy.my_wind_cap = ((app_myenergy.annual_wind_gen / 365) / 0.024) / app_myenergy.capacity_factor;
+            
+            // Save config to db
+            var config = app.config;
+            if (config==false) config = {};
+            config["myenergy"] = {
+                "annualwindgen": app_myenergy.annual_wind_gen,
+                "solarpower": app_myenergy.solarpower,
+                "housepower": app_myenergy.housepower
+            };
+            app.setconfig(config);
+            
+            var timeWindow = (3600000*24.0*1);
+            view.end = +new Date;
+            view.start = view.end - timeWindow;
+            app_myenergy.draw();
+            
+        });
     },
 
     show: function() 
@@ -82,7 +129,12 @@ var app_myenergy = {
         this.livefn();
         this.live = setInterval(this.livefn,10000);
         
-        $("body").css("background-color","#111");
+        $("body").css("background-color","#222");
+        
+        $(window).ready(function(){
+            $("#footer").css('background-color','#181818');
+            $("#footer").css('color','#999');
+        });
 
         var top_offset = 0;
         var placeholder_bound = $('#myenergy_placeholder_bound');
@@ -120,28 +172,27 @@ var app_myenergy = {
     
     livefn: function()
     {
-        var solar_now = 0;
+    
+        var feeds = app_myenergy.getfeedsbyid();
+        
         var use_now = 0;
-        var feeds = {};
-        $.ajax({                                      
-            url: path+"feed/list.json",
-            dataType: 'json',
-            async: false,                      
-            success: function(data_in) { feeds = data_in; } 
-        });
-
-        for (z in feeds)
-        {
-            var name = feeds[z].name.toLowerCase();
-            
-            if (name.indexOf("solar_power")!=-1) {
-                solar_now = feeds[z].value;
-            }
-            
-            if (name.indexOf("house_power")!=-1) {
-                use_now = feeds[z].value;
-            }
+        var solar_now = 0;
+        
+        if (feeds[app_myenergy.housepower]!=undefined) use_now = 1*feeds[app_myenergy.housepower].value;
+        if (feeds[app_myenergy.solarpower]!=undefined) solar_now = 1*feeds[app_myenergy.solarpower].value;
+        
+        /*
+        var use_now = 0;
+        var housefeeds = app_myenergy.housepower.split(",");
+        for (z in housefeeds) {
+            use_now += 1*feeds[housefeeds[z]].value;
         }
+        
+        var solar_now = 0;
+        var solarfeeds = app_myenergy.solarpower.split(",");
+        for (z in solarfeeds) {
+            solar_now += 1*feeds[solarfeeds[z]].value;
+        }*/
         
         var totalgen = solar_now;
         var balance = totalgen - use_now;
@@ -176,22 +227,66 @@ var app_myenergy = {
             this.lastviewstart = view.start;
             this.lastviewend = view.end;
             
-            app_myenergy.solar_data = this.getdata(this.config.solarpower,view.start,view.end,interval);
-            app_myenergy.house_data = this.getdata(this.config.housepower,view.start,view.end,interval);
+            if (app_myenergy.housepower) app_myenergy.house_data = this.getdata(app_myenergy.housepower,view.start,view.end,interval);
+            if (app_myenergy.solarpower) app_myenergy.solar_data = this.getdata(app_myenergy.solarpower,view.start,view.end,interval);
+            
+            // This section loads the feed data, including summing if multiple are specified
+            /*
+            var tmp = [];
+            var i = 0;
+            var feeds = app_myenergy.housepower.split(",");
+            for (z in feeds) {
+                var feed = feeds[z];
+                tmp[i] = this.getdata(feed,view.start,view.end,interval);
+                i++;
+            }
+            
+            var power = [];
+            app_myenergy.house_data = [];
+            for (z in tmp[0]) {
+                for (s in tmp) {
+                    if (tmp[s][z][1]!=null) power[s] = tmp[s][z][1];
+                }
+                var sum = 0; for (s in tmp) sum+= power[s];
+                app_myenergy.house_data.push([tmp[0][z][0],sum]);
+            }
+            
+            var tmp = [];
+            var i = 0;
+            var feeds = app_myenergy.solarpower.split(",");
+            for (z in feeds) {
+                var feed = feeds[z];
+                tmp[i] = this.getdata(feed,view.start,view.end,interval);
+                i++;
+            }
+            
+            var power = [];
+            app_myenergy.solar_data = [];
+            for (z in tmp[0]) {
+                for (s in tmp) {
+                    if (tmp[s][z][1]!=null) power[s] = tmp[s][z][1];
+                }
+                var sum = 0; for (s in tmp) sum+= power[s];
+                app_myenergy.solar_data.push([tmp[0][z][0],sum]);
+            }
+            */
+            
+            app_myenergy.wind_data = this.getdataremote(67088,view.start,view.end,interval);
         }
         
         var use = 0;
         var gen = 0;
         var wind = 0;
         
-        var interval = (app_myenergy.house_data[1][0] - app_myenergy.house_data[0][0])/1000;
-        var t = 0;
+        
         
         var use_data = [];
         var gen_data = [];
         var mywind_data = [];
         var bal_data = [];
         var store_data = [];
+        
+        if (app_myenergy.house_data.length!=0) {
         
         var store = 0;
         var mysolar = 0;
@@ -200,6 +295,9 @@ var app_myenergy = {
         var total_wind_kwh = 0;
         var total_use_kwh = 0;
         var total_use_direct_kwh = 0;
+        
+        var interval = (app_myenergy.house_data[1][0] - app_myenergy.house_data[0][0])/1000;
+        var t = 0;
         
         for (z in app_myenergy.house_data) {
             if (app_myenergy.house_data[z]!=undefined && app_myenergy.house_data[z][1]!=null) use = app_myenergy.house_data[z][1];
@@ -241,8 +339,12 @@ var app_myenergy = {
         
         $("#total_use_via_store_kwh").html((total_use_kwh-total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*(1-(total_use_direct_kwh/total_use_kwh)))+"%)");
         
+        }
+        
         options.xaxis.min = view.start;
         options.xaxis.max = view.end;
+        
+        console.log(store_data);
         
         $.plot($('#myenergy_placeholder'), 
             [
@@ -254,12 +356,40 @@ var app_myenergy = {
         );
     },
     
+    getfeedsbyid: function()
+    {
+        var feeds = {};
+        $.ajax({                                      
+            url: path+"feed/list.json",
+            dataType: 'json',
+            async: false,                      
+            success: function(data_in) { feeds = data_in; } 
+        });
+        
+        var byid = {};
+        for (z in feeds) byid[feeds[z].id] = feeds[z];
+        return byid;
+    },
+    
     getdata: function(id,start,end,interval)
     {
         var data = [];
         $.ajax({                                      
-            url: path+"feed/history.json",                         
-            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval,
+            url: path+"feed/data.json",                         
+            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
+            dataType: 'json',
+            async: false,                      
+            success: function(data_in) { data = data_in; } 
+        });
+        return data;
+    },
+    
+    getdataremote: function(id,start,end,interval)
+    {
+        var data = [];
+        $.ajax({                                      
+            url: path+"app/dataremote.json",                         
+            data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      
             success: function(data_in) { data = data_in; } 
