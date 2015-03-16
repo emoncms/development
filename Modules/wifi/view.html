@@ -1,0 +1,178 @@
+<script type="text/javascript" src="jquery-1.9.0.min.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+<div class="container">
+    <h2>Wifi Config</h2>
+    <br>
+    <button id="wifi_scan" class="btn">Scan</button>
+    
+    <br><br>
+    <div id="networks"></div>
+
+    <button id="wifi_save" class="btn">Save</button>
+    <hr>
+
+    <button id="wifi_info" class="btn" style="float:right">Refresh</button> 
+    <button id="wifi_restart" class="btn" style="float:right">Restart</button> 
+    <button id="wifi_stop" class="btn" style="float:right">Stop</button> 
+    <button id="wifi_start" class="btn" style="float:right">Start</button>
+    <h3>Connection Info</h3>
+        <table class="table">
+        <tr>
+            <td>
+                <b>Status: <span class="status"></span></b><br>
+                <b>IP Address: </b><span class="IPAddress"></span><br>
+                <b>Mac Address: </b><span class="MacAddress"></span><br>
+                <b>Sub Net Mask: </b><span class="SubNetMask"></span><br>
+                <b>Rx Packets: </b><span class="RxPackets"></span><br>
+                <b>Tx Packets: </b><span class="TxPackets"></span><br>
+                <b>Rx Bytes: </b><span class="RxBytes"></span><br>
+                <b>Tx Bytes: </b><span class="TxBytes"></span><br>
+            </td>
+            <td>
+                <b>Bitrate: </b><span class="Bitrate"></span><br>
+                <b>Frequency: </b><span class="Freq"></span><br>
+                <b>Link Quality: </b><span class="LinkQuality"></span><br>
+                <b>Signal Quality: </b><span class="SignalLevel"></span><br>
+            </td>
+        </tr>
+        </table>
+
+</div>
+
+<script>
+
+    var networks = wifi_getconfig();
+    draw_network_list();
+    wifi_scan();
+    wifi_info();
+
+    $("#wifi_start").click(function(){    
+        $.ajax({ type: 'POST', url: "start" });
+    });
+
+    $("#wifi_stop").click(function(){    
+        $.ajax({ type: 'POST', url: "stop" });
+    });
+    
+    $("#wifi_reset").click(function(){    
+        $.ajax({ type: 'POST', url: "restart" });
+    });
+
+    $("#wifi_scan").click(function(){    
+        wifi_scan();
+    });
+    
+    $("#wifi_info").click(function(){    
+        wifi_info();
+    });
+    
+    $("#wifi_save").click(function(){
+    
+        for (z in networks)
+        {
+            var psk = $(".psk[ssid='"+z+"']").val();
+            networks[z]["PSK"] = psk;
+        }
+    
+        $.ajax({type: 'POST', url: "wifi/setconfig.json", data: "networks="+JSON.stringify(networks), dataType: 'json', async: true, 
+            success: function(data) {
+                $("#info").html(JSON.stringify(data));
+            }
+        });
+    });   
+    
+    $("#networks").on("click",".showpsk",function(){
+        var ssid = $(this).attr("ssid");
+        if ($(".psk[ssid='"+ssid+"']").attr("type")=="password") {
+            $(".psk[ssid='"+ssid+"']").removeAttr("type");
+            $(".psk[ssid='"+ssid+"']").prop("type","text");
+            $(this).removeClass("icon-eye-open");
+            $(this).addClass("icon-eye-close");
+        } else {
+            $(".psk[ssid='"+ssid+"']").removeAttr("type");
+            $(".psk[ssid='"+ssid+"']").prop("type","password");
+            $(this).removeClass("icon-eye-close");
+            $(this).addClass("icon-eye-open");
+        }
+    });
+    
+    function wifi_info()
+    {
+        $.ajax({url: "wifi/info.json", dataType: 'json', async: true, 
+            success: function(data) {
+                if (data["status"]=="connected") {
+                    $(".status").html("<span style='color:#00aa00'>Connected</span>");
+                } else {
+                    $(".status").html("<span style='color:#aa0000'>Disconnected</span>");
+                }
+                $(".IPAddress").html(data["IPAddress"]);
+                $(".MacAddress").html(data["MacAddress"]);
+                $(".SubNetMask").html(data["SubNetMask"]);
+                $(".RxPackets").html(data["RxPackets"]);
+                $(".TxPackets").html(data["TxPackets"]);
+                $(".RxBytes").html(data["RxBytes"]);
+                $(".TxBytes").html(data["TxBytes"]);
+                $(".Bitrate").html(data["Bitrate"]);
+                $(".Freq").html(data["Freq"]);
+                $(".LinkQuality").html(data["LinkQuality"]);
+                $(".SignalLevel").html(data["SignalLevel"]);
+            }
+        });
+    }
+    
+    function wifi_scan()
+    {
+        $.ajax({url: "wifi/scan.json", dataType: 'json', async: true, 
+            success: function(data) {
+                for (z in data) {
+                    networks[z] = data[z];
+                }
+                draw_network_list();
+            }
+        });
+    }
+    
+    function wifi_getconfig()
+    {
+        var config = {};
+        $.ajax({url: "wifi/getconfig.json", dataType: 'json', async: false, 
+            success: function(data) { config = data; }
+        });
+        if (config.length==0) config = {};
+        return config;
+    }
+    
+    function draw_network_list()
+    {
+        var out = "";
+        for (z in networks)
+        {
+            var psk = $(".psk[ssid='"+z+"']").val();
+            networks[z]["PSK"] = psk;
+            
+            if (networks[z]['SIGNAL']!=0) {
+                out += "<tr class='success'>";
+                out += "<td><b>SSID</b></td>";
+                out += "<td>"+z+" (Security: "+networks[z]['SECURITY']+")</td>";
+                out += "<td>- "+networks[z]['SIGNAL']+" dBm</td>";
+                out += "<tr class='success'><td><b>PSK</b></td>";
+            } else {
+                out += "<tr>";
+                out += "<td><b>SSID</b></td>";
+                out += "<td>"+z+"</td>";
+                out += "<td><i>---</i></td>";
+                out += "<tr><td><b>PSK</b></td>";
+            }
+            out += "<td><input class='psk' ssid='"+z+"' type='password' value='";
+            if (networks[z]['PSK']!=undefined) out += networks[z]['PSK'];
+            out += "'/ > <i ssid='"+z+"' class='showpsk icon-eye-open' style='cursor:pointer'></i></td><td></td></tr>";
+            out += "</tr>";
+        }
+        $("#networks").html("<table class='table'>"+out+"</table>");
+    }
+</script>
+
+
