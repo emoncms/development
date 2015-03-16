@@ -50,15 +50,15 @@
     wifi_info();
 
     $("#wifi_start").click(function(){    
-        $.ajax({ type: 'POST', url: "start" });
+        $.ajax({ type: 'POST', url: "wifi/start.json" });
     });
 
     $("#wifi_stop").click(function(){    
-        $.ajax({ type: 'POST', url: "stop" });
+        $.ajax({ type: 'POST', url: "wifi/stop.json.json" });
     });
     
     $("#wifi_reset").click(function(){    
-        $.ajax({ type: 'POST', url: "restart" });
+        $.ajax({ type: 'POST', url: "wifi/restart.json" });
     });
 
     $("#wifi_scan").click(function(){    
