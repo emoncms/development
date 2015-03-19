@@ -35,13 +35,16 @@ class Wifi
 	    $networks = array();
 	    foreach($return as $network) {
 		    $arrNetwork = preg_split("/[\t]+/",$network);
-		    $ssid = $arrNetwork[4];
-		    $networks[$ssid] = array(
-		        "BSSID"=>$arrNetwork[0],
-		        "CHANNEL"=>$arrNetwork[1], 
-		        "SIGNAL"=>$arrNetwork[2],
-		        "SECURITY"=>substr($arrNetwork[3],1,-1)
-		    );
+		    if (isset($arrNetwork[4]))
+		    {
+		        $ssid = $arrNetwork[4];
+		        $networks[$ssid] = array(
+		            "BSSID"=>$arrNetwork[0],
+		            "CHANNEL"=>$arrNetwork[1], 
+		            "SIGNAL"=>$arrNetwork[2],
+		            "SECURITY"=>substr($arrNetwork[3],1,-1)
+		        );
+		    }   
 	    }
 	    return $networks;
     }
