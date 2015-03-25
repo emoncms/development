@@ -1,7 +1,7 @@
 <?php global $path; ?>
 
 <script>
-    var path = "http://"+window.location.host+"/"; 
+    var path = "<?php print $path; ?>";
 </script>
 
 <link href="<?php echo $path; ?>Modules/app/style.css" rel="stylesheet">
