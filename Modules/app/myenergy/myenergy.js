@@ -1,7 +1,7 @@
 var app_myenergy = {
 
-    solarpower: false,
-    housepower: false,
+    solarpower: 0,
+    housepower: 0,
     
     feedname: "",
     
@@ -178,6 +178,11 @@ var app_myenergy = {
         var use_now = 0;
         var solar_now = 0;
         
+        var national_wind = app_myenergy.getvalueremote(67088);
+        var prc_of_capacity = national_wind / 8000;
+        app_myenergy.wind_now = app_myenergy.my_wind_cap * prc_of_capacity;
+        var wind_now = app_myenergy.wind_now;
+        
         if (feeds[app_myenergy.housepower]!=undefined) use_now = 1*feeds[app_myenergy.housepower].value;
         if (feeds[app_myenergy.solarpower]!=undefined) solar_now = 1*feeds[app_myenergy.solarpower].value;
         
@@ -194,11 +199,12 @@ var app_myenergy = {
             solar_now += 1*feeds[solarfeeds[z]].value;
         }*/
         
-        var totalgen = solar_now;
+        var totalgen = solar_now + wind_now ;
         var balance = totalgen - use_now;
         
-        $("#solarnow").html(solar_now);
-        $("#usenow").html(use_now);
+        $("#gridwindnow").html(Math.round(wind_now));
+        $("#solarnow").html(Math.round(solar_now));
+        $("#usenow").html(Math.round(use_now));
         
         $("#totalgen").html(Math.round(totalgen));
         $("#chargerate").html(Math.round(balance));
@@ -219,7 +225,7 @@ var app_myenergy = {
             selection: { mode: "x" }
         }
         
-        var npoints = 1500;
+        var npoints = 1000;
         interval = Math.round(((view.end - view.start)/npoints)/1000);
         
         if (view.start!=this.lastviewstart || view.end!=this.lastviewend)
@@ -286,7 +292,6 @@ var app_myenergy = {
         var bal_data = [];
         var store_data = [];
         
-        if (app_myenergy.house_data.length!=0) {
         
         var store = 0;
         var mysolar = 0;
@@ -296,10 +301,18 @@ var app_myenergy = {
         var total_use_kwh = 0;
         var total_use_direct_kwh = 0;
         
-        var interval = (app_myenergy.house_data[1][0] - app_myenergy.house_data[0][0])/1000;
+        var npoints = 0;
+        
+        if (app_myenergy.house_data.length>2) {
+            interval = (app_myenergy.house_data[1][0] - app_myenergy.house_data[0][0])/1000;
+            npoints = app_myenergy.house_data.length;
+        } else {
+            interval = (app_myenergy.wind_data[1][0] - app_myenergy.wind_data[0][0])/1000;
+            npoints = app_myenergy.wind_data.length;
+        }
         var t = 0;
         
-        for (z in app_myenergy.house_data) {
+        for (var z=0; z<npoints; z++) {
             if (app_myenergy.house_data[z]!=undefined && app_myenergy.house_data[z][1]!=null) use = app_myenergy.house_data[z][1];
             if (app_myenergy.solar_data[z]!=undefined && app_myenergy.solar_data[z][1]!=null) mysolar = app_myenergy.solar_data[z][1];
             if (app_myenergy.wind_data[z]!=undefined && app_myenergy.wind_data[z][1]!=null) wind = app_myenergy.wind_data[z][1];
@@ -321,7 +334,9 @@ var app_myenergy = {
             total_wind_kwh += (mywind*interval)/(1000*3600);
             total_use_kwh += (use*interval)/(1000*3600);
             
-            var time = app_myenergy.house_data[z][0];
+            var time = 0;
+            if (app_myenergy.house_data[z]!=undefined) time = app_myenergy.house_data[z][0];
+            if (app_myenergy.wind_data[z]!=undefined) time = app_myenergy.wind_data[z][0];
             use_data.push([time,use]);
             gen_data.push([time,gen]);
             bal_data.push([time,balance]);
@@ -339,12 +354,9 @@ var app_myenergy = {
         
         $("#total_use_via_store_kwh").html((total_use_kwh-total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*(1-(total_use_direct_kwh/total_use_kwh)))+"%)");
         
-        }
         
         options.xaxis.min = view.start;
         options.xaxis.max = view.end;
-        
-        console.log(store_data);
         
         $.plot($('#myenergy_placeholder'), 
             [
@@ -395,5 +407,18 @@ var app_myenergy = {
             success: function(data_in) { data = data_in; } 
         });
         return data;
+    },
+    
+    getvalueremote: function(id)
+    {
+        var value = 0;
+        $.ajax({                                      
+            url: path+"app/valueremote.json",                         
+            data: "id="+id, dataType: 'text', async: false,                      
+            success: function(data_in) {
+                value = data_in;
+            } 
+        });
+        return value;
     }
 }
