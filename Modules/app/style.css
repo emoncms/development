@@ -4,7 +4,6 @@
     margin: 0px auto;
     text-align: left;
 
-    padding:20px;
     padding-top:0px;
     margin-top:0px;
 }
@@ -19,6 +18,8 @@ hr {
     background: #0699fa;
     border: 0; height: 1px;
     padding: 0px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
 .electric-title {
@@ -47,7 +48,8 @@ hr {
     font-weight:normal; 
     font-size:22px; 
     color:#0699fa;
-    padding-top:15px;
+    padding-top:2px;
+    padding-bottom:2px;
 }
 
 .visnavblock {

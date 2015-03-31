@@ -1,4 +1,4 @@
-<div class="page">
+<div class="container">
 
     <div id="mysolarpv-config" style="display:none; ">
         
@@ -17,6 +17,9 @@
             </td>
         </table>
         
+        <br><br>
+        <p style="color:#888; text-align:center"><b>Configuration:</b> This dashboard automatically looks for feeds named or containing the words: solar_power, house_power. To use this dashboard add these names to the relevant feeds.</p>
+
         <button id="mysolarpv-configsave" class="btn btn-primary">Save</button>
     </div>
     
@@ -66,12 +69,9 @@
         <div id="mysolarpv_placeholder"></div>
     </div>
     
-    <br><br>
+    <br>
+    <hr><div class="midtext" style="">In this window:</div><hr>
     <table style="width:100%">
-    
-    <tr style="border-bottom: 1px solid #0699fa; border-top: 1px solid #0699fa;">
-        <td><div class="midtext" style="padding-bottom:15px">In this window:</div></td><td></td>
-    </tr>
     <tr>
     
         <td>
@@ -80,8 +80,8 @@
         </td>
     
         <td>
-            <div class="midtext">Supplied direct from solar: <b><span id="total_use_direct_kwh">0</span></b></div>
-            <div class="midtext">Supplied via grid: <b><span id="total_use_via_store_kwh">0</span></b></div>
+            <div class="midtext">Supplied from solar: <b><span id="total_use_direct_kwh">0</span>kWh</b></div>
+            <div class="midtext">Supplied via grid: <b><span id="total_use_via_store_kwh">0</span>kWh</b></div>
         </td>
     
     </tr>
@@ -94,7 +94,6 @@
     </div>
     
     -->
-<br><br>
-<p style="color:#888; text-align:center"><b>Configuration:</b> This dashboard automatically looks for feeds named or containing the words: solar_power, house_power. To use this dashboard add these names to the relevant feeds.</p>
+
 </div>
 </div>

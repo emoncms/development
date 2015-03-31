@@ -105,6 +105,11 @@ var app_mysolarpv = {
             app_mysolarpv.draw();
             
         });
+ 
+        $(window).resize(function(){
+            app_mysolarpv.resize();
+            app_mysolarpv.draw();
+        });
         
         /*
         $(document).on("socketio_msg",function( event, msg ) {
@@ -137,34 +142,49 @@ var app_mysolarpv = {
             $("#footer").css('color','#999');
         });
 
+        app_mysolarpv.resize();
+        app_mysolarpv.draw();
+        app_mysolarpv.draw_bargraph();
+    },
+    
+    resize: function() 
+    {
         var top_offset = 0;
         var placeholder_bound = $('#mysolarpv_placeholder_bound');
         var placeholder = $('#mysolarpv_placeholder');
 
         var width = placeholder_bound.width();
-        var height = placeholder_bound.height();
+        var height = $(window).height()*0.55;
+
+        if (height>width) height = width;
 
         placeholder.width(width);
         placeholder_bound.height(height);
         placeholder.height(height-top_offset);
-
-        app_mysolarpv.draw();
-        app_mysolarpv.draw_bargraph();
-
-        /*
-        $(window).resize(function(){
-            var width = placeholder_bound.width();
-            var height = width * 0.5;
-
-            placeholder.width(width);
-            placeholder_bound.height(height);
-            placeholder.height(height-top_offset);
-
-            options.xaxis.min = view.start;
-            options.xaxis.max = view.end;
-            $.plot(placeholder, [{data:data,color: plotColour}], options);
-        });
-        */
+        
+        console.log(width);
+        if (width<=500) {
+            $(".electric-title").css("font-size","16px");
+            $(".power-value").css("font-size","38px");
+            $(".power-value").css("padding-top","12px");
+            $(".power-value").css("padding-bottom","8px");
+            $(".midtext").css("font-size","14px");
+            $("#balanceline").hide();
+        } else if (width<=724) {
+            $(".electric-title").css("font-size","18px");
+            $(".power-value").css("font-size","64px");
+            $(".power-value").css("padding-top","22px");
+            $(".power-value").css("padding-bottom","12px");
+            $(".midtext").css("font-size","18px");
+            $("#balanceline").show();
+        } else {
+            $(".electric-title").css("font-size","22px");
+            $(".power-value").css("font-size","85px");
+            $(".power-value").css("padding-top","40px");
+            $(".power-value").css("padding-bottom","20px");
+            $(".midtext").css("font-size","20px");
+            $("#balanceline").show();
+        }
     },
     
     hide: function() 
