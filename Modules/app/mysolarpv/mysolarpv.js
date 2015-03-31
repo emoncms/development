@@ -162,7 +162,6 @@ var app_mysolarpv = {
         placeholder_bound.height(height);
         placeholder.height(height-top_offset);
         
-        console.log(width);
         if (width<=500) {
             $(".electric-title").css("font-size","16px");
             $(".power-value").css("font-size","38px");
