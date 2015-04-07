@@ -219,7 +219,7 @@ var app_mysolarpv = {
         var options = {
             lines: { fill: fill },
             xaxis: { mode: "time", timezone: "browser", min: view.start, max: view.end},
-            //yaxis: { min: 0 },
+            yaxis: { min: 0 },
             grid: {hoverable: true, clickable: true},
             selection: { mode: "x" }
         }
@@ -336,9 +336,12 @@ var app_mysolarpv = {
     
     getfeedsbyid: function()
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var feeds = {};
         $.ajax({                                      
-            url: path+"feed/list.json",
+            url: path+"feed/list.json"+apikeystr,
             dataType: 'json',
             async: false,                      
             success: function(data_in) { feeds = data_in; } 
@@ -351,9 +354,12 @@ var app_mysolarpv = {
     
     getdata: function(id,start,end,interval)
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var data = [];
         $.ajax({                                      
-            url: path+"feed/data.json",                         
+            url: path+"feed/data.json"+apikeystr,                         
             data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      

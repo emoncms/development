@@ -389,9 +389,12 @@ var app_myenergy = {
     
     getfeedsbyid: function()
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var feeds = {};
         $.ajax({                                      
-            url: path+"feed/list.json",
+            url: path+"feed/list.json"+apikeystr,
             dataType: 'json',
             async: false,                      
             success: function(data_in) { feeds = data_in; } 
@@ -404,9 +407,12 @@ var app_myenergy = {
     
     getdata: function(id,start,end,interval)
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var data = [];
         $.ajax({                                      
-            url: path+"feed/data.json",                         
+            url: path+"feed/data.json"+apikeystr,                         
             data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      
@@ -416,10 +422,10 @@ var app_myenergy = {
     },
     
     getdataremote: function(id,start,end,interval)
-    {
+    {   
         var data = [];
         $.ajax({                                      
-            url: path+"app/dataremote.json",                         
+            url: path+"app/dataremote.json",
             data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      
@@ -429,10 +435,10 @@ var app_myenergy = {
     },
     
     getvalueremote: function(id)
-    {
+    {   
         var value = 0;
         $.ajax({                                      
-            url: path+"app/valueremote.json",                         
+            url: path+"app/valueremote.json",                       
             data: "id="+id, dataType: 'text', async: false,                      
             success: function(data_in) {
                 value = data_in;

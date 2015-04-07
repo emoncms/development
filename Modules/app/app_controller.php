@@ -14,13 +14,18 @@ function app_controller()
 
     if ($route->format == 'html')
     {
-        if ($route->action == "" && $session['write']) $result = view("Modules/app/client.php",array());
+        if ($route->action == "" && $session['write']) {
+            $result = view("Modules/app/client.php",array());
+        }
     }
     
     if ($route->format == 'json')
     {
-        if ($route->action == "setconfig" && $session['write']) $result = $appconfig->set($session['userid'],get('data'));
-        if ($route->action == "getconfig" && $session['read']) $result = $appconfig->get($session['userid']);
+        if ($route->action == "setconfig" && $session['write']) 
+            $result = $appconfig->set($session['userid'],get('data'));
+            
+        if ($route->action == "getconfig" && $session['read']) 
+            $result = $appconfig->get($session['userid']);
         
         if ($route->action == "dataremote")
         {

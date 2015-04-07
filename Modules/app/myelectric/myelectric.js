@@ -170,7 +170,7 @@ var app_myelectric = {
             if (app_myelectric.dailytype==0)
             {
                 var lastday = daily_data_copy[daily_data_copy.length-1][0];
-                daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed]]);
+                daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed].value]);
 
                 for (var z=1; z<daily_data_copy.length; z++)
                 {
@@ -184,8 +184,8 @@ var app_myelectric = {
             else if (app_myelectric.dailytype==1)
             {
                 var lastday = daily_data_copy[daily_data_copy.length-1][0];
-                if (feeds[app_myelectric.dailyfeed]!=0) {
-                    daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed]]);
+                if (feeds[app_myelectric.dailyfeed].value!=0) {
+                    daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed].value]);
                 }
                 for (var z=1; z<daily_data_copy.length; z++)
                 {
@@ -202,10 +202,9 @@ var app_myelectric = {
             // kWh per day
             else if (app_myelectric.dailytype==2)
             {
-                var lastday = daily_data_copy[daily_data_copy.length-1][0];
-                daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed]]);
+                // var lastday = daily_data_copy[daily_data_copy.length-1][0];
+                // daily_data_copy.push([lastday+24*3600*1000,feeds[app_myelectric.dailyfeed].value]);
                 daily = daily_data_copy;
-                
                 $("#kwhd").html((daily[daily.length-1][1]*1).toFixed(1));
             }
             // Power (Watts)
@@ -226,9 +225,11 @@ var app_myelectric = {
     
     getfeedsbyid: function()
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
         var feeds = {};
         $.ajax({                                      
-            url: path+"feed/list.json",
+            url: path+"feed/list.json"+apikeystr,
             dataType: 'json',
             async: false,                      
             success: function(data_in) { feeds = data_in; } 
@@ -243,7 +244,7 @@ var app_myelectric = {
     {
         var data = [];
         $.ajax({                                      
-            url: path+"feed/data.json",                         
+            url: path+"feed/data.json"+apikeystr,                         
             data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=0&limitinterval=0",
             dataType: 'json',
             async: false,                      

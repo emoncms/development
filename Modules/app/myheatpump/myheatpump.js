@@ -250,9 +250,12 @@ var app_myheatpump = {
     
     getfeedsbyid: function()
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var feeds = {};
         $.ajax({                                      
-            url: path+"feed/list.json",
+            url: path+"feed/list.json"+apikeystr,
             dataType: 'json',
             async: false,                      
             success: function(data_in) { feeds = data_in; } 
@@ -265,9 +268,12 @@ var app_myheatpump = {
     
     getdata: function(id,start,end,interval)
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var data = [];
         $.ajax({                                      
-            url: path+"feed/data.json",                         
+            url: path+"feed/data.json"+apikeystr,                         
             data: "id="+id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=1&limitinterval=1",
             dataType: 'json',
             async: false,                      
