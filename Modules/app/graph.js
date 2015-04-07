@@ -71,13 +71,17 @@ var graph = {
         xmax += 3600000*14;
         
         var scale = 1;
+        var days = ['S','M','T','W','T','F','S'];
         
         for (s in series)
         {
             var data = series[s]; 
             for (z in data)
             {
-            
+                var d = new Date();
+                d.setTime(data[z][0]);
+                var dayid = d.getDay();
+                
                 var x = ((data[z][0] - xmin) / (xmax - xmin)) * this.width;
                 var y = this.height - (((data[z][1] - ymin) / (ymax - ymin)) * this.height);
                   
@@ -86,13 +90,20 @@ var graph = {
                 var barwidth = ((3600000*20) / (xmax - xmin)) * this.width;
                 
                 ctx.fillStyle = "#0699fa";
+                if (dayid==0 || dayid==6) ctx.fillStyle = "#0779c1";
+                
                 ctx.fillRect(x-(barwidth/2),y-7,barwidth,this.height-y);
                   
                               // Text is too small if less than 2kWh
                 if ((this.height-y)>25) {
                     ctx.textAlign    = "center";
                     ctx.fillStyle = "#ccccff";
+                    
+                    ctx.font = "16px arial";
                     ctx.fillText((data[z][1]*scale).toFixed(0),x,y+20-7);
+                    
+                    ctx.font = "14px arial";
+                    ctx.fillText(days[dayid],x,this.height-15);
                 }
             }
             ctx.stroke();
