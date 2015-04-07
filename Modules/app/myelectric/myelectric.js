@@ -159,7 +159,7 @@ var app_myelectric = {
         }
         
         var feeds = app_myelectric.getfeedsbyid();
-        $("#power").html(feeds[app_myelectric.powerfeed].value);
+        $("#power").html((feeds[app_myelectric.powerfeed].value*1).toFixed(0));
         
         var daily_data_copy = eval(JSON.stringify(app_myelectric.daily_data));
 
