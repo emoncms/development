@@ -221,12 +221,12 @@ var app_myenergy = {
         var totalgen = solar_now + wind_now ;
         var balance = totalgen - use_now;
         
-        $("#gridwindnow").html(Math.round(wind_now));
-        $("#solarnow").html(Math.round(solar_now));
-        $("#usenow").html(Math.round(use_now));
+        $("#myenergy-gridwindnow").html(Math.round(wind_now));
+        $("#myenergy-solarnow").html(Math.round(solar_now));
+        $("#myenergy-usenow").html(Math.round(use_now));
         
-        $("#totalgen").html(Math.round(totalgen));
-        $("#chargerate").html(Math.round(balance));
+        $("#myenergy-totalgen").html(Math.round(totalgen));
+        $("#myenergy-chargerate").html(Math.round(balance));
     },
     
     draw: function ()
@@ -364,14 +364,14 @@ var app_myenergy = {
             
             t += interval;
         }
-        $("#total_solar_kwh").html(total_solar_kwh.toFixed(1));
-        $("#total_wind_kwh").html(total_wind_kwh.toFixed(1));
-        $("#total_gen_kwh").html((total_solar_kwh+total_wind_kwh).toFixed(1));
+        $("#myenergy_total_solar_kwh").html(total_solar_kwh.toFixed(1));
+        $("#myenergy_total_wind_kwh").html(total_wind_kwh.toFixed(1));
+        $("#myenergy_total_gen_kwh").html((total_solar_kwh+total_wind_kwh).toFixed(1));
         
-        $("#total_use_kwh").html((total_use_kwh).toFixed(1));
-        $("#total_use_direct_kwh").html((total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*total_use_direct_kwh/total_use_kwh)+"%)");
+        $("#myenergy_total_use_kwh").html((total_use_kwh).toFixed(1));
+        $("#myenergy_total_use_direct_kwh").html((total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*total_use_direct_kwh/total_use_kwh)+"%)");
         
-        $("#total_use_via_store_kwh").html((total_use_kwh-total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*(1-(total_use_direct_kwh/total_use_kwh)))+"%)");
+        $("#myenergy_total_use_via_store_kwh").html((total_use_kwh-total_use_direct_kwh).toFixed(1)+"kWh ("+Math.round(100*(1-(total_use_direct_kwh/total_use_kwh)))+"%)");
         
         
         options.xaxis.min = view.start;

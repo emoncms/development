@@ -242,6 +242,9 @@ var app_myelectric = {
     
     getdata: function(id,start,end,interval)
     {
+        var apikeystr = "";
+        if (apikey!="") apikeystr = "?apikey="+apikey;
+        
         var data = [];
         $.ajax({                                      
             url: path+"feed/data.json"+apikeystr,                         
