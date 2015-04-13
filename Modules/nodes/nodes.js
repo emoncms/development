@@ -13,6 +13,18 @@ var app_nodes = {
             $(".node").hide();
             $(".node[nid="+nid+"]").show();
         });
+        /*
+        $("#node-content").on("click",".node-key",function() {
+            var nodeid = $(this).parent().parent().attr("nid");
+            var value = $(this).html();
+            console.log("node key click "+nodeid);
+            $(this).html("<input class='vedit' type='text' value='"+value+"' />");
+        });
+        
+        $("#node-content").on("change",".vedit",function() {
+            console.log("value changed");
+            console.log($(this).value());
+        });*/
     },
     
     show: function() {

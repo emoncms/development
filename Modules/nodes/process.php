@@ -78,8 +78,6 @@ class Process
 
         // Get last value
         $last = $this->feed->get_timevalue($feedid);
-
-        $last['time'] = strtotime($last['time']);
         if (!isset($last['value'])) $last['value'] = 0;
         $last_kwh = $last['value']*1;
         $last_time = $last['time']*1;
@@ -100,7 +98,8 @@ class Process
             $new_kwh = $last_kwh;
         }
 
-        $this->feed->insert_data($feedid, $time_now, $time_now, $new_kwh);
+        $padding_mode = "join";
+        $this->feed->insert_data_padding_mode($feedid, $time_now, $time_now, $new_kwh, $padding_mode);
         return $value;
     }
     
@@ -111,7 +110,8 @@ class Process
         
         $last = $this->feed->get_timevalue($feedid);
         $value = $last['value'] + $value;
-        $this->feed->insert_data($feedid, $time, $time, $value);
+        $padding_mode = "join";
+        $this->feed->insert_data_padding_mode($feedid, $time, $time, $value, $padding_mode);
         return $value;
     }
     
@@ -139,7 +139,8 @@ class Process
             
             if ($val_diff>0 && $power<$max_power) $totalwh += $val_diff;
             
-            $this->feed->insert_data($feedid, $time, $time, $totalwh);
+            $padding_mode = "join";
+            $this->feed->insert_data_padding_mode($feedid, $time, $time, $totalwh, $padding_mode);
             
         }
         $redis->hMset("process:whaccumulator:$feedid", array('time' => $time, 'value' => $value));

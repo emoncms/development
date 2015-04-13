@@ -12,10 +12,13 @@
     // no direct access
     defined('EMONCMS_EXEC') or die('Restricted access');
 
+
 function nodes_controller()
 {
     global $route,$redis,$mysqli,$feed_settings;
     $result = false;
+    
+    $emoncms_config_file = "/home/pi/data/emoncms.conf";
     
     include "Modules/feed/feed_model.php";
     $feed = new Feed($mysqli,$redis, $feed_settings);
@@ -66,18 +69,24 @@ function nodes_controller()
         if ($varid!==false) $propid++;
         if ($rxtx!==false) $propid++;
         if (isset($url[$propid])) $prop = $url[$propid];
+        
+        if (!$redis->exists("config")) {
+            $config = json_decode(file_get_contents($emoncms_config_file));
+            $redis->set("config",json_encode($config));
+        } else {
+            $config = json_decode($redis->get("config"));
+        }
             
         if ($route->method == 'POST')
         {
+            $config_changed = false;
+            
             // if ($nodeid===false && $varid===false && $prop!==false) {
             //     if ($prop=="config") $redis->set("config",$input);
             // }
 
             if ($nodeid!==false && $varid===false && $prop!==false) 
             {
-                $config_changed = false;
-                $config = json_decode($redis->get("config"));
-                
                 if ($config==null) {
                     $config = new stdClass;
                     $config_changed = true;
@@ -139,44 +148,28 @@ function nodes_controller()
                     $result = $config;
                     $config_changed = true;
                 }
-                
-                if ($config_changed) {
-                    $redis->set("config",json_encode($config));
-                    
-                    $fh = fopen("/home/pi/emoncms.conf","w");
-                    fwrite($fh,json_encode($config,JSON_PRETTY_PRINT));
-                    fclose($fh);
-                }
             }
             
-            
             if ($nodeid!==false && $varid!==false && $rxtx!==false && $prop!==false) 
-            {
-                $config = json_decode($redis->get("config"));
-                
+            {   
                 if ($prop=="name") $config->$nodeid->$rxtx->names[$varid] = $input;
                 if ($prop=="unit") $config->$nodeid->$rxtx->units[$varid] = $input;
                 if ($prop=="processlist") $config->$nodeid->$rxtx->processlists[$varid] = json_decode($input);
-                
-                $redis->set("config",json_encode($config));
-                $fh = fopen("/home/pi/emoncms.conf","w");
-                fwrite($fh,json_encode($config,JSON_PRETTY_PRINT));
-                fclose($fh);
-                
                 $result = $config;
+                $config_changed = true;
             }
             
+            if ($config_changed) 
+            {
+                $redis->set("config",json_encode($config));
+                $fh = fopen($emoncms_config_file,"w");
+                fwrite($fh,json_encode($config,JSON_PRETTY_PRINT));
+                fclose($fh);
+            } 
         }
 
         if ($route->method == 'GET')
         {
-            if (!$redis->exists("config")) {
-                $config = json_decode(file_get_contents("/home/pi/emoncms.conf"));
-                $redis->set("config",json_encode($config));
-            } else {
-                $config = json_decode($redis->get("config"));
-            }
-            
             $nodes = json_decode($redis->get("nodes"));
             if (!$config) $config = new stdClass;
             if (!$nodes) $nodes = new stdClass;
@@ -193,6 +186,7 @@ function nodes_controller()
                 }
                 $result = $config;
             }
+            
             
             if ($nodeid!==false && isset($config->$nodeid))
             {
@@ -252,7 +246,6 @@ function nodes_controller()
             }
         }
     }
-    
     
     return array('content'=>$result, 'fullwidth'=>true);
 }

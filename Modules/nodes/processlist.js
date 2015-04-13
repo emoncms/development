@@ -259,9 +259,10 @@ var processlist_ui =
             var rxtx = processlist_ui.rxtx;
             var vid = processlist_ui.vid;
             
-            $.ajax({ 
-                url: path+"nodes/set/"+nodeid+"/"+rxtx+"/"+vid+"/processlist",
-                data: "val="+JSON.stringify(processlist_ui.variableprocesslist), 
+            $.ajax({
+                type: 'POST',
+                url: path+"nodes/"+nodeid+"/"+rxtx+"/"+vid+"/processlist",
+                data: JSON.stringify(processlist_ui.variableprocesslist), 
                 dataType: 'text', async: false, 
                 success: function(data){
                     console.log(data);
