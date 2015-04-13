@@ -17,6 +17,8 @@ function config_controller()
     global $route, $session;
     $result = false;
     
+    $emonhub_config_file = "/home/pi/data/emonhub.conf";
+    
     if (!$session['write']) return array('content'=>false);
      
     if ($route->action == 'view') {
@@ -27,7 +29,7 @@ function config_controller()
     
     if ($route->action == 'get') { 
         $route->format = "text";
-        $result = file_get_contents("/home/trystan/Desktop/hub3/conf/emonhub.conf");
+        $result = file_get_contents($emonhub_config_file);
     }
     
     if ($route->action == 'getlog') { 
@@ -42,7 +44,7 @@ function config_controller()
         $route->format = "text";
         $config = $_POST['config'];
         
-        $fh = fopen("/home/trystan/Desktop/hub3/conf/emonhub.conf","w");
+        $fh = fopen($emonhub_config_file,"w");
         fwrite($fh,$config);
         fclose($fh);
         
