@@ -65,7 +65,7 @@
     
     function procmsg($topic,$input)
     {  
-        global $redis, $config;
+        global $redis, $config, $emoncms_config_file, $emonhub_config_file;
         
         $time = time();
         $t = explode("/",$topic);
@@ -121,12 +121,15 @@
             if ($rxtx!==false) {
                 $nodes->$nodeid->$rxtx->time = $time;
                 $nodes->$nodeid->$rxtx->values = $values;
-                
-                $processlists = $config->$nodeid->$rxtx->processlists;
-                // $process->nodes = $nodes;
-                for ($id=0; $id<count($processlists); $id++)
+
+                if (isset($config->$nodeid->$rxtx->processlists))
                 {
-                    // $process->input($time,$values[$id],$processlists[$id]);
+                    $processlists = $config->$nodeid->$rxtx->processlists;
+                    // $process->nodes = $nodes;
+                    for ($id=0; $id<count($processlists); $id++)
+                    {
+                        // $process->input($time,$values[$id],$processlists[$id]);
+                    }
                 }
             }
             $redis->set("nodes",json_encode($nodes));
@@ -144,7 +147,7 @@
 
     function load_config()
     {
-        global $redis;
+        global $redis, $emoncms_config_file, $emonhub_config_file;
 
         // 1) Load config from emoncms side        
         if (!$redis->exists("config")) {
