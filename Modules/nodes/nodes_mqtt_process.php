@@ -25,10 +25,15 @@
     $redis->connect("127.0.0.1");
     $redis->del("config");
     $redis->del("nodes");
+    
+
+    
     include "Modules/feed/feed_model.php";
     $feed = new Feed($mysqli,$redis,$feed_settings);
     
-    
+    include "Modules/nodes/process.php";
+    $process = new Process($mysqli,$feed);
+     
     $config = load_config();
     
     // ----------------------------------------------------------------
@@ -65,7 +70,7 @@
     
     function procmsg($topic,$input)
     {  
-        global $redis, $config, $emoncms_config_file, $emonhub_config_file;
+        global $redis, $config, $emoncms_config_file, $emonhub_config_file, $process, $feed;
         
         $time = time();
         $t = explode("/",$topic);
@@ -125,10 +130,10 @@
                 if (isset($config->$nodeid->$rxtx->processlists))
                 {
                     $processlists = $config->$nodeid->$rxtx->processlists;
-                    // $process->nodes = $nodes;
+                    // $process->nodes = $config;
                     for ($id=0; $id<count($processlists); $id++)
                     {
-                        // $process->input($time,$values[$id],$processlists[$id]);
+                        $process->input($time,$values[$id],$processlists[$id]);
                     }
                 }
             }
@@ -165,7 +170,20 @@
         
         // 3) Run through emoncms config to check if any of the values are different, copy over from emonhub nodes
         foreach ($emonhubnodes as $nid=>$node) {
-            if (!isset($config->$nid)) $config->$nid = new stdClass;
+            if (!isset($config->$nid)) {
+                $config->$nid = new stdClass;
+                $config->$nid->nodename = "";
+                $config->$nid->hardware = "";
+                $config->$nid->firmware = "";
+                $config->$nid->rx = new stdClass;
+                $config->$nid->rx->names = array();
+                $config->$nid->rx->units = array();
+                $config->$nid->rx->processlists = array();
+                $config->$nid->tx = new stdClass;
+                $config->$nid->tx->names = array();
+                $config->$nid->tx->units = array();
+                $config->$nid->tx->processlists = array();
+            }
             
             if (isset($emonhubnodes->$nid->nodename)) $config->$nid->nodename = $emonhubnodes->$nid->nodename;
             if (isset($emonhubnodes->$nid->hardware)) $config->$nid->hardware = $emonhubnodes->$nid->hardware;
