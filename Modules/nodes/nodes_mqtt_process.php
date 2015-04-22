@@ -2,7 +2,7 @@
     // This code is released under the GNU Affero General Public License.
     // OpenEnergyMonitor project:
     // http://openenergymonitor.org
-    
+
     $emoncms_config_file = "/home/pi/data/emoncms.conf";
     $emonhub_config_file = "/home/pi/data/emonhub.conf";
         
@@ -15,18 +15,33 @@
     
     chdir("/var/www/emoncms");
     
+    // Emoncms logger
     require "Modules/log/EmonLogger.php";
-    
-    include "Modules/nodes/ConfObj.php";
-    
+    $log = new EmonLogger(__FILE__);
+    $log->set_logfile("/var/log/emoncms.log");
+    $log->set_topic("MQTT");
+    $log->info("Starting emoncms mqtt nodes process");
+        
+    require "Modules/nodes/ConfObj.php";
     require "process_settings.php";
+    
+    // Connect to mysql
     $mysqli = @new mysqli($server,$username,$password,$database);
+    while ($mysqli->connect_error) {
+        sleep(1);
+        $log->warn("Could not connect to mysql, retrying");
+        $mysqli = @new mysqli($server,$username,$password,$database);
+    }
+    
+    // Connect to redis
     $redis = new Redis();
-    $redis->connect("127.0.0.1");
+    while (!$redis->connect("127.0.0.1")) {
+        sleep(1);
+        $log->warn("Could not connect to redis, retrying");
+    }
+    
     $redis->del("config");
     $redis->del("nodes");
-    
-
     
     include "Modules/feed/feed_model.php";
     $feed = new Feed($mysqli,$redis,$feed_settings);
@@ -46,7 +61,7 @@
     $topics = array();
     $topics[$topic] = array("qos"=>0, "function"=>"procmsg");
     
-    print "subscribing to $topic\n";
+    $log->info("subscribing to $topic");
     $mqtt->subscribe($topics,0);
 
     $last = time();
@@ -59,7 +74,7 @@
         // Reload config every 5 seconds
         $now = time();
         if (($now - $last)>5.0) {
-            print "reloading config\n";
+            $log->info("Reloading config");
             $last = $now;
             $config = load_config();
         }
@@ -70,7 +85,9 @@
     
     function procmsg($topic,$input)
     {  
-        global $redis, $config, $emoncms_config_file, $emonhub_config_file, $process, $feed;
+        global $log, $redis, $config, $emoncms_config_file, $emonhub_config_file, $process, $feed;
+        
+        $log->info("Received mqtt message: $topic $input");
         
         $time = time();
         $t = explode("/",$topic);
@@ -92,6 +109,7 @@
             }
             
             if (!isset($config->$nodeid)) {
+                $log->info("Registering new node $nodeid");
                 $config->$nodeid = new stdClass;
                 $config->$nodeid->nodename = "";
                 $config->$nodeid->hardware = "";
@@ -131,9 +149,12 @@
                 {
                     $processlists = $config->$nodeid->$rxtx->processlists;
                     // $process->nodes = $config;
-                    for ($id=0; $id<count($processlists); $id++)
+                    foreach($processlists as $id=>$varproclist)
                     {
-                        $process->input($time,$values[$id],$processlists[$id]);
+                        $value = $values[$id];
+                        $log->info("Processing $nodeid:$id $value");
+                            $process->input($time,$value,$varproclist);
+                        $log->info("Process $nodeid:$id complete");
                     }
                 }
             }
@@ -141,7 +162,7 @@
             $result = $nodes;
             
             if ($config_changed) {
-                print "saving config";
+                $log->info("Saving changed config");
                 $redis->set("config",json_encode($config));
                 $fh = fopen($emoncms_config_file,"w");
                 fwrite($fh,json_encode($config,JSON_PRETTY_PRINT));
