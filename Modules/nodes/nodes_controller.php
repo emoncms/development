@@ -135,6 +135,14 @@ function nodes_controller()
                         {
                             $process->input($time,$values[$id],$processlists[$id]);
                         }
+                        
+                        if ($rxtx=="tx") {
+                            require("Lib/phpMQTT.php");
+                            $mqtt = new phpMQTT("127.0.0.1", 1883, "emoncmstx");
+                            if(!$mqtt->connect()) exit(1);
+                            
+                            $mqtt->publish("emonhub/tx/$nodeid/values", implode(",",$values));
+                        }
                     }
                     $redis->set("nodes",json_encode($nodes));
                     $result = $nodes;
