@@ -2,12 +2,12 @@
 
 <br>
 <h2>My Local IP</h2>
-<p>Local emonBase and port forwarding needs to be configured to use this feature</p>
+<p>A local emonBase base-station is required and port forwarding needs to be configured to use this feature</p>
 
 <table class="table">
     <tr>
-        <th>WAN: If your away</th>
-        <th>LAN: If your at home</th>
+        <th>WAN: If you're away</th>
+        <th>LAN: If you're at home</th>
         <th>Last updated</th>
     </tr>
     <tr>
@@ -23,7 +23,7 @@
 <pre>
 <?php echo $path; ?>myip/set.json?apikey=<span id="apikey"></span>
 </pre>
-<p><i>To view your local emonBase emoncms opening firewall http port 80 on your router is required</i></p>
+<p><i>To view your local emonBase's emoncms via the Internet, you must open port 80 (HTTP) on your router's firewall. This is also known as port forwarding.</i></p>
 
 
 
