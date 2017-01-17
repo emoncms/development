@@ -1,0 +1,94 @@
+html, body {
+    height: 100%;
+}
+
+body {
+  margin:0;
+  background-color:#eee;
+  font-family: Dejavu Sans;
+}
+
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -35px;
+}
+
+.appname {
+    color:#fff;
+    font-size:14px;
+    display:inline-block;
+    padding:11px;
+    padding-bottom:0px;
+    float:left;
+}
+
+.username {
+    color:#fff;
+    font-weight:bold;
+    font-size:14px;
+    display:inline-block;
+    padding-top:11px;
+    padding-bottom:0px;
+    float:left;
+}
+
+.device {
+    width:100%;
+}
+
+.device-inner {
+    margin:10px;
+    padding:20px;
+    background-color:#fff;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.device-title {
+    color:#333;
+    font-weight:bold;
+    font-size:16px;
+}
+
+.device-name {
+    color:#666;
+    font-weight:normal;
+    font-size:12px;
+    padding-top:5px;
+}
+
+.btn {
+    text-align:center;
+    height: 38px;
+    padding:6px 10px;
+    color:#fff;
+    background: none;
+    border-radius: 8px;
+    border: 1px solid #fff;
+}
+
+.btn:hover {
+    background: rgba(255,255,255,0.2);
+    cursor:pointer;
+}
+
+.login-box {
+  text-align:center;
+  background-color:rgba(255,255,255,0.2); 
+  width:300px; 
+  margin: 0 auto;
+  border-radius: 15px;
+  padding:10px;
+  margin-top:100px;
+}
+
+#footer {
+    background-color: #ccc;
+    color:#555;
+    text-align: left;
+    font-size: 12px;
+    padding-top:10px;
+    padding-left:8px;
+    height:25px;
+}

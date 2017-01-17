@@ -1,0 +1,24 @@
+.topmenu {
+    height:40px;
+    background-color:#29abe2;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.topmenuitem {
+    float:right;
+    font-size:14px;
+    color:#fff;
+    padding:10px;
+    border-left: 1px solid rgba(255,255,255,0.2);
+}
+
+.topmenuitem:hover {
+    background: rgba(255,255,255,0.2);
+    cursor:pointer;
+}
+
+.topmenuitem a {
+    color:#fff;
+    text-decoration:none;
+}
+

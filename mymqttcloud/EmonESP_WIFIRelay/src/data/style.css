@@ -1,0 +1,245 @@
+body {
+    width: 100%;
+    height: 100%;
+    font-family: Arial,"sans-serif";
+    font-size: 14px;
+    background-color: #29abe2;
+    color: #777777;
+    margin: 0;
+}
+
+/*----------------*/
+
+#page {
+    height: 100%;
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+@media screen and (min-width: 1024px) {
+
+#left-hand-container {
+    width: 50%;
+    float: left;
+    margin-bottom: 40px;
+}
+}
+
+@media screen and (min-width: 1024px) {
+  
+#right-hand-container {
+    width: 50%;
+    float: right;
+    margin-bottom: 40px;
+}
+}
+
+#one,#two,#three,#four,#five,#six,#seven {
+    background-color:rgba(255,255,255,0.2); 
+    box-sizing: border-box;
+    margin: 5px 5px 5px 5px;
+    color:#fff;
+}
+
+@media screen and (min-width: 1024px) {
+     #one,#two,#three {
+         vertical-align: top;
+         display: inline-block;
+         width: 500px;
+     }
+}
+
+@media screen and (min-width: 1024px) {
+     #four,#five,#six,#seven {
+        vertical-align: top;
+         display: inline-block;
+         width: 500px;
+         right: 0;
+     }
+}
+
+.itembody-wrapper {
+    padding: 5px 25px 5px 25px;
+}
+
+input[type="text"],
+input[type="password"] {
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 280px;
+}
+
+@media screen and (max-width: 420px) {
+    input[type="text"],
+    input[type="password"]  {
+        width: 240px;
+    }
+}
+
+#update {
+    background-color: red;
+}
+
+#small-text{
+font-size: 10px;
+word-wrap: break-word;
+}
+
+/*----------------*/
+
+table {
+    border-collapse: collapse;
+    margin: 10px auto 0 auto;
+    max-height: 100px;
+    border-style: none;
+    width:100%;
+}
+
+th {
+   background: rgba(255,255,255,0.2);
+   color: #ffffff;
+   border: 1px solid #fff;
+   padding: 8px;
+}
+
+td {
+   background: rgba(255,255,255,0.2);
+   color: #fff;
+   border: 1px solid #fff;
+   padding: 8px;
+}
+
+/*----------------*/
+
+p {
+    padding-top: 10px;
+}
+
+
+a {
+  text-decoration: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+h2 {
+    background: rgba(255,255,255,0.2);
+    font-size: 18px;
+    color: #ffffff;
+    padding: 12px;
+    margin: 0;
+}
+
+button {
+    text-align:center;
+    height: 38px;
+    padding:6px 10px;
+    color:#fff;
+    background: none;
+    border-radius: 8px;
+    border: 1px solid #fff;
+}
+
+button:hover {
+    background: rgba(255,255,255,0.2);
+    cursor:pointer;
+}
+
+/*----------------*/
+
+.box {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 0;
+}
+
+.box h1 {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    text-align: center;
+    margin: 0;
+    color:#fff;
+    padding-top:15px;
+    padding-bottom:15px;
+}
+
+.box h1 span {
+    color: #0699fa;
+}
+
+.box h3 {
+    padding-top: 7px;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    font-size: 19px;
+    text-align: center;
+    color: #b6b6b6;
+    margin: -12px 0 0 0;
+}
+
+/*----------------*/
+
+#footer-small-scrn {
+    width: 100%;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    font-size: 15px;
+    text-align: center;
+    padding: 5px;
+    color: #bcbcbc;
+}
+
+#footer-large-scrn {
+    display: none;
+}
+
+@media screen and (min-width: 1024px) {
+  
+#footer-small-scrn {
+    display: none;
+}
+}
+
+@media screen and (min-width: 1024px) {
+  
+#footer-large-scrn {
+    position: fixed;
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    font-family: Arial,"sans-serif";
+    font-size: 15px;
+    text-align: center;
+    padding: 5px;
+    color: #bcbcbc;
+    bottom: 0;
+    background-color: #ffffff;
+}
+}
+
+#footer-large-scrn a, #footer-small-scrn a {
+    color: #0699fa;
+}
+
+#footer-large-scrn span, #footer-small-scrn span {
+    color: #777777;
+}
+
+input[type="text"],
+input[type="password"] {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: rgba(255,255,255,0.5);
+  color:#fff;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  box-shadow: none;
+  box-sizing: border-box; }
+
+
+

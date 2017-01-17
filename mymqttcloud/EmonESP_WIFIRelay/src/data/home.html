@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>emonESP</title>
+</head>
+<body>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="width=device-width, user-scalable=no" name="viewport">
+    <meta content="emonESP" name="description">
+    <meta content="OpenEnergyMonitor" name="author">
+    <meta content="#000000" name="theme-color">
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <div id="page">
+        <div class="box">
+            <h1>emonESP WIFI Relay</h1>
+        </div><!--<div id="client-view" style="display:none">-->
+        <div id="left-hand-container">
+            <div id="one">
+                <h2>WiFi Network</h2>
+                <div class="itembody-wrapper">
+                  <p>Connect to local WiFi network:</p>
+                    <p><b>Mode:</b> <span id="mode"></span></p>
+                    <div id="client-view">
+                        <!--<p><b>Network SSID:</b><br><span id="sta-ssid"></span></p>
+                            <p><b>Network RSSI:</b><br><span id="sta-rssi"></span></p> -->
+                        <table>
+                            <tr>
+                                <th>Network</th>
+                                <th>RSSI dBm</th>
+                            </tr>
+                            <tbody id="sta-ssid"></tbody>
+                        </table>
+                        <p><b>IP Address:</b><br>
+                        <span id="sta-ip"></span></p><button id="apoff" style=
+                        "display:none">Turn off Access Point</button>
+                    </div>
+                    <div id="ap-view" style="display:none">
+                        <p>Connect to network:</p>
+                        <table>
+                            <tr>
+                                <th>Select</th>
+                                <th>Network</th>
+                                <th>RSSI dBm</th>
+                            </tr>
+                            <tbody id="networks"></tbody>
+                        </table>
+                        <p><b>Passkey:</b><br>
+                        <input id="passkey" type="text"> <button id=
+                        "connect">Connect</button></p>
+                    </div>
+                    <div id="wait-view" style="display:none">
+                        <p>Connecting to WiFi Network...Please wait 10s</p>
+                    </div>
+                </div>
+            </div>
+            <!--//////////////////////////////////////////////////////////////////////////////////-->
+            <div id="two">
+                <h2>MQTT</h2>
+                <div class="itembody-wrapper">
+                    <p>MQTT server to publish data to:</p>
+                    <p><b>MQTT Server:</b><br>
+                    <input id="mqtt_server" type="text"></p><span>e.g 'emonpi'
+                    or '192.168.1.4'</span><br>
+                    <p><b>MQTT Base-topic:</b><br>
+                    <input id="mqtt_topic" type="text"></p><span>e.g
+                    'user/1/smartplug12'</span><br>
+                    <br>
+                    
+                    <p><b>Username:</b><br>
+                    <input id="mqtt_user" type="text"></p>
+                    <p><b>Password:</b><br>
+                    <input id="mqtt_pass" type="password"></p>
+                    <p><button id="save-mqtt">Save</button> <b>&nbsp;
+                    Connected:&nbsp;<span id="mqtt_connected"></span></b></p>
+                </div>
+            </div>
+        </div>
+        <!--//////////////////////////////////////////////////////////////////////////////////-->
+        <div id="right-hand-container">
+            <!--//////////////////////////////////////////////////////////////////////////////////-->
+            <div id="three">
+                <h2>Admin</h2>
+                <div class="itembody-wrapper">
+                    <p>Web access authentication:</p>
+                    <p><b>Username:</b><br>
+                    <input id="www_user" type="text" value="admin"></p>
+                    <p><b>Password:</b><br>
+                    <input id="www_pass" type="password"><br>
+                    <br>
+                    <br>
+                    <button id="save-admin">Save</button></p>
+                </div>
+            </div>
+            <!--//////////////////////////////////////////////////////////////////////////////////-->
+            <div id="four">
+                <h2>Firmware</h2>
+                <div class="itembody-wrapper">
+                    <div id="firmware" style="display:none">
+                        <table>
+                            <tr>
+                                <th>Running</th>
+                                <th>Latest</th>
+                            </tr>
+                            <tbody id="firmware-version"></tbody>
+                        </table><br>
+                        <a href=
+                        "https://github.com/openenergymonitor/EmonESP/releases">
+                        View changelog</a><br>
+                    </div><br>
+                    <button id="updatecheck">Check for Updates</button> or 
+                    <button id="upload">Upload</button><br><br>
+                </div>
+            </div>
+            <!--//////////////////////////////////////////////////////////////////////////////////-->
+            <div id="five">
+                <h2>System</h2>
+                <div class="itembody-wrapper">
+                    <p><b>Free RAM:</b> <span id="free_heap"></span>B</p>
+                    <p><b>Version:</b> <a href=
+                    "https://github.com/openenergymonitor/EmonESP/releases">v<span id="version"></span></a></p><button id="restart">Restart</button>
+                    <button id="reset">Factory Reset</button><br><br>
+                </div>
+            </div>
+        </div>
+        <div id="footer-small-scrn">
+            Powered by <a href=
+            "http://openenergymonitor.org"><span>Open</span>EnergyMonitor.org</a>
+        </div>
+    </div>
+    
+    <script src="config.js" type="text/javascript">
+    </script>
+</body>
+</html>
