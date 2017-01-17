@@ -29,4 +29,26 @@ Create access list table:
     
     CREATE TABLE acls (`id` int(11) not null auto_increment primary key, `username` varchar(30), `topic` text, `rw` int(11)) ENGINE=MYISAM;
 
+### Running the app
 
+1) Copy contents of repo to html directory of apache server with php, redis, mysql and mqtt support. (Directories learn_mqtt and EmonESP_WifiRelay can be removed).
+
+2) Create the first user as a MQTT super user. Register a new account with secure password and then login to mysql and increase user level to super user with UPDATE users SET super=1 WHERE id=1;
+
+3) Run mosquitto with:
+
+    sudo mosquitto -c /etc/mosquitto/mosquitto.conf
+
+4) **mqtt_worker.py** Open and set mqtt username and password to that of the super user. For testing just run with: 
+
+    python mqtt_worker.py
+
+5) Create another user via web app (this time without super user status) and login. Note down the user ID printed in the footer.
+
+6) Upload EmonESP_WIFIRelay code to WIFI Relay module (the relay is configured on digital 5).
+
+7) Power up the relay module, configure WIFI and enter MQTT username and password to that of the user last created.
+
+8) Set MQTT basetopic to user/USERID/smartplugID (replace USERID with the userid of the account to associate with and ID in smartplugID to a unique number to distinguish between multiple smartplugs)
+
+9) Connect and that should be it. The WIFI relay module should initialise a Smart Plug device in the device list with an ON/OFF button that can be used to switch the relay unit.
