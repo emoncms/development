@@ -45,8 +45,7 @@ r1.onreadystatechange = function () {
       document.getElementById("mode").innerHTML = "Access Point (AP)";
       document.getElementById("client-view").style.display = 'none';
       document.getElementById("ap-view").style.display = '';
-      document.getElementById("input-api").innerHTML = "<a href='http://"+status.ipaddress+"/input?string=ct1:3935,ct2:325'>"+"http://"+status.ipaddress+"/input?string=ct1:3935,ct2:325</a>";
-
+      
       var out = "";
       for (var z in status.networks) {
         if (status.rssi[z]=="undefined") status.rssi[z]="";
@@ -177,7 +176,6 @@ document.getElementById("save-mqtt").addEventListener("click", function(e) {
     var mqtt = {
       server: document.getElementById("mqtt_server").value,
       topic: document.getElementById("mqtt_topic").value,
-      prefix: document.getElementById("mqtt_feed_prefix").value,
       user: document.getElementById("mqtt_user").value,
       pass: document.getElementById("mqtt_pass").value
     }
@@ -188,7 +186,8 @@ document.getElementById("save-mqtt").addEventListener("click", function(e) {
       var r = new XMLHttpRequest();
       r.open("POST", "savemqtt", true);
       r.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-      r.send("&server="+mqtt.server+"&topic="+mqtt.topic+"&prefix="+mqtt.prefix+"&user="+mqtt.user+"&pass="+mqtt.pass);
+      var prefix = "";
+      r.send("&server="+mqtt.server+"&topic="+mqtt.topic+"&prefix="+prefix+"&user="+mqtt.user+"&pass="+mqtt.pass);
       r.onreadystatechange = function () {
         console.log(mqtt);
         if (r.readyState != 4 || r.status != 200) return;

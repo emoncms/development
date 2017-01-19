@@ -41,8 +41,9 @@ void setup() {
   Serial1.begin(115200);
 #endif
 
-  pinMode(5, OUTPUT);
-  pinMode(16, OUTPUT);
+  pinMode(5, OUTPUT);          // WIFI RELAY
+  // pinMode(12, OUTPUT);      // SONOFF S20
+  // pinMode(16, OUTPUT);
 
   DEBUG.println();
   DEBUG.print("EmonESP ");

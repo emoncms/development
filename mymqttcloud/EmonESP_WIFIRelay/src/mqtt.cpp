@@ -50,15 +50,15 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   char state = (char) payload[0];
 
   if (state=='1') {
-    DEBUG.println("12:HIGH");
-    digitalWrite(5,HIGH);
-     DEBUG.println("16:HIGH");
-    digitalWrite(16,HIGH); 
+    DEBUG.println("STATE:1");
+    digitalWrite(5,HIGH);       // RELAY WIFI RELAY
+    //digitalWrite(12,HIGH);      // RELAY SONOFF S20
+    // digitalWrite(16,HIGH); 
   } else {
-    DEBUG.println("12:LOW");
-    digitalWrite(5,LOW);
-     DEBUG.println("16:LOW");
-    digitalWrite(16,LOW);
+    DEBUG.println("STATE:0");
+    digitalWrite(5,HIGH);       // RELAY WIFI RELAY
+    //digitalWrite(12,LOW);       // RELAY SONOFF S20
+    // digitalWrite(16,LOW);
   }
 
 }
