@@ -53,12 +53,12 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
     DEBUG.println("STATE:1");
     digitalWrite(5,HIGH);       // RELAY WIFI RELAY
     //digitalWrite(12,HIGH);      // RELAY SONOFF S20
-    // digitalWrite(16,HIGH); 
+    digitalWrite(16,HIGH); 
   } else {
     DEBUG.println("STATE:0");
-    digitalWrite(5,HIGH);       // RELAY WIFI RELAY
+    digitalWrite(5,LOW);       // RELAY WIFI RELAY
     //digitalWrite(12,LOW);       // RELAY SONOFF S20
-    // digitalWrite(16,LOW);
+    digitalWrite(16,LOW);
   }
 
 }
