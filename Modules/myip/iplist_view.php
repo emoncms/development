@@ -6,8 +6,8 @@
 
 <table class="table">
     <tr>
-        <th>WAN: If your away</th>
-        <th>LAN: If your at home</th>
+        <th>WAN: External</th>
+        <th>LAN: Internal</th>
         <th>Last updated</th>
     </tr>
     <tr>
